@@ -24,6 +24,8 @@
     #include <wx/file.h>
     #include <wx/filename.h>
     #include <wx/regex.h>
+    #include <wx/tokenzr.h>
+
 #endif
 
 #include "crc32.h"
@@ -34,13 +36,21 @@
 #include "sc_plugin.h"
 #include "sqstdstring.h"
 
+#include <wx/progdlg.h>
+
+
 template<> ScriptingManager* Mgr<ScriptingManager>::instance = nullptr;
 template<> bool  Mgr<ScriptingManager>::isShutdown = false;
 
 static wxString s_ScriptErrors;
 static wxString capture;
 
-void PrintSquirrelToWxString(wxString& msg, const SQChar* s, va_list& vl)
+
+int ID_ScriptingManager_Debug_Timer=wxNewId();
+
+
+void PrintSquirrelToWxString(wxString &msg,const SQChar * s, va_list& vl)
+
 {
     int buffer_size = 2048;
     SQChar* tmp_buffer;
@@ -82,12 +92,15 @@ static void CaptureScriptOutput(HSQUIRRELVM /*v*/, const SQChar * s, ...)
 }
 
 BEGIN_EVENT_TABLE(ScriptingManager, wxEvtHandler)
+    EVT_TIMER(ID_ScriptingManager_Debug_Timer,ScriptingManager::OnDebugTimer)
 //
 END_EVENT_TABLE()
 
 ScriptingManager::ScriptingManager()
     : m_AttachedToMainWindow(false),
-    m_MenuItemsManager(false) // not auto-clear
+    m_MenuItemsManager(false), // not auto-clear
+    m_rdbg(nullptr),
+    m_DebugerUpdateTimer(this,ID_ScriptingManager_Debug_Timer)
 {
     //ctor
 
@@ -102,8 +115,11 @@ ScriptingManager::ScriptingManager()
 
     RefreshTrusts();
 
+    m_enable_debugger = false;
+
     // register types
     ScriptBindings::RegisterBindings();
+
 }
 
 ScriptingManager::~ScriptingManager()
@@ -122,6 +138,15 @@ ScriptingManager::~ScriptingManager()
         myMap.insert(myMap.end(), std::make_pair(key, value));
     }
     Manager::Get()->GetConfigManager(_T("security"))->Write(_T("/trusted_scripts"), myMap);
+
+    if(m_enable_debugger)
+    {
+        sq_rdbg_shutdown(m_rdbg);
+
+        IncludeSet::iterator itr = m_debugger_created_temp_files.begin();
+        for(;itr != m_debugger_created_temp_files.end();++itr)
+            wxRemoveFile((*itr));
+    }
 
     SquirrelVM::Shutdown();
 }
@@ -166,12 +191,12 @@ bool ScriptingManager::LoadScript(const wxString& filename)
     // read file
     wxString contents = cbReadFileContents(f);
     m_CurrentlyRunningScriptFile = fname;
-    bool ret = LoadBuffer(contents, fname);
+    bool ret = LoadBuffer(contents, fname,true);
     m_CurrentlyRunningScriptFile.Clear();
     return ret;
 }
 
-bool ScriptingManager::LoadBuffer(const wxString& buffer, const wxString& debugName)
+bool ScriptingManager::LoadBuffer(const wxString& buffer,wxString debugName,bool real_path)
 {
     // includes guard to avoid recursion
     wxString incName = UnixFilename(debugName);
@@ -187,6 +212,27 @@ bool ScriptingManager::LoadBuffer(const wxString& buffer, const wxString& debugN
     s_ScriptErrors.Clear();
 
     // compile script
+    if(m_enable_debugger && !real_path)
+    {
+        wxFile tmp_file;
+        wxString tmp_file_path = wxFileName::CreateTempFileName(debugName,&tmp_file);
+        if(tmp_file_path.IsEmpty())
+        {
+            Manager::Get()->GetLogManager()->LogError(_("ScriptingManager::LoadBuffer: Could not create tmp file, for debugging"));
+        } else
+        {
+            m_debugger_created_temp_files.insert(tmp_file_path);
+            if(tmp_file.Write(buffer,wxConvUTF8) == false)
+                Manager::Get()->GetLogManager()->LogError(_("ScriptingManager::LoadBuffer: Error on writing in file: ")+ tmp_file_path);
+
+            tmp_file.Close();
+            debugName = tmp_file_path;
+        }
+    }
+
+    if(m_rdbg)
+        m_rdbg->InformNewFileLoaded(SquirrelVM::GetVMPtr(),debugName.ToUTF8().data());
+
     SquirrelObject script;
     try
     {
@@ -223,7 +269,7 @@ wxString ScriptingManager::LoadBufferRedirectOutput(const wxString& buffer)
     ::capture.Clear();
 
     sq_setprintfunc(SquirrelVM::GetVMPtr(), CaptureScriptOutput);
-    bool res = LoadBuffer(buffer);
+    bool res = LoadBuffer(buffer, _("Load_buffer_redirect"));
     sq_setprintfunc(SquirrelVM::GetVMPtr(), ScriptsPrintFunc);
 
     return res ? ::capture : (wxString) wxEmptyString;
@@ -471,4 +517,50 @@ void ScriptingManager::OnScriptMenu(wxCommandEvent& event)
 void ScriptingManager::OnScriptPluginMenu(wxCommandEvent& event)
 {
     ScriptBindings::ScriptPluginWrapper::OnScriptMenu(event.GetId());
+}
+
+
+void ScriptingManager::ParseDebuggerCMDLine(wxString cmd_line)
+{
+    if(cmd_line == wxEmptyString)
+        return; // Debugging is not enabled
+
+    wxStringTokenizer tokenizer(cmd_line,_(":"));
+    if(!tokenizer.HasMoreTokens() || tokenizer.CountTokens() != 2)
+        return; // No token. Error?
+
+    int port = wxAtoi(tokenizer.GetNextToken());
+    if(port <= 0)
+        return; // Port out of range
+
+
+    bool halt = tokenizer.GetNextToken().Cmp(_("h")) == 0;
+
+    m_rdbg = sq_rdbg_init(SquirrelVM::GetVMPtr(),port,SQFalse);
+	if(m_rdbg) {
+        Manager::Get()->GetLogManager()->DebugLog(_("Squirrel debugging is enabled"));
+		//!! ENABLES DEBUG INFO GENERATION(for the compiler)
+		sq_enabledebuginfo(SquirrelVM::GetVMPtr(), SQTrue);
+		m_enable_debugger = true;
+		if(halt)
+		{
+		    wxProgressDialog pd(wxString::Format(_("wait for a debugger connect on port %d"),port),wxString::Format(_("wait for a debugger connect on port %d"),port));
+		    Manager::Get()->GetLogManager()->DebugLog(_("Squirrel debugger HALT"));
+		    pd.Update(50);
+		    sq_rdbg_waitforconnections(m_rdbg);
+		    pd.Update(100);
+		}
+
+		m_DebugerUpdateTimer.Start(500);
+
+	}
+}
+
+void ScriptingManager::OnDebugTimer(wxTimerEvent& event)
+{
+    if(m_rdbg)
+    {
+        // The debugger needs a periodically update
+        sq_rdbg_update(m_rdbg);
+    }
 }

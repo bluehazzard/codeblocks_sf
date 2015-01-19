@@ -530,7 +530,7 @@ void CompilerCommandGenerator::DoBuildScripts(cbProject* project, CompileTargetB
         }
 
         // clear previous script's context
-        Manager::Get()->GetScriptingManager()->LoadBuffer(clearout_buildscripts);
+        Manager::Get()->GetScriptingManager()->LoadBuffer(clearout_buildscripts, _("clear_script"));
 
         // if the script doesn't exist, just return
         if (!Manager::Get()->GetScriptingManager()->LoadScript(script_nomacro))

@@ -311,7 +311,8 @@ cbDebuggerPlugin::SyncEditorResult cbDebuggerPlugin::SyncEditor(const wxString& 
         }
     }
     FileType ft = FileTypeOf(filename);
-    if (ft != ftSource && ft != ftHeader && ft != ftResource && ft != ftTemplateSource)
+
+    if (ft != ftSource && ft != ftHeader && ft != ftResource && ft != ftScript && ft != ftTemplateSource)
     {
         // if the line is >= 0 and ft == ftOther assume, that we are in header without extension
         if (line < 0 || ft != ftOther)

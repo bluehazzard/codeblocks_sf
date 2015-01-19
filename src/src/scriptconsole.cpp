@@ -184,6 +184,7 @@ void ScriptConsole::OnbtnLoadClick(cb_unused wxCommandEvent& event)
         {
             Log(_("Loading script failed."));
             txtConsole->AppendText(Manager::Get()->GetScriptingManager()->GetErrorString());
+
         }
     }
     txtCommand->SetFocus();

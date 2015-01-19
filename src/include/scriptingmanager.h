@@ -18,6 +18,10 @@
 #include "manager.h"
 #include "menuitemsmanager.h"
 #include <wx/intl.h>
+#include <wx/timer.h>
+#include "scripting/include/sqrdbg.h"
+#include "scripting/include/sqdbgserver.h"
+
 
 struct SquirrelError;
 
@@ -74,9 +78,11 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
           *
           * @param buffer The script buffer to compile and run.
           * @param debugName A debug name. This will appear in any errors displayed.
+          * @param real_path If the debug name is not a path to a real file this has to be set on false. (This is needed to create a temporary file to allow the debugger to open also memory files)
           * @return True if the script compiled, false if not.
           */
-        bool LoadBuffer(const wxString& buffer, const wxString& debugName = _T("CommandLine"));
+        bool LoadBuffer(const wxString& buffer,wxString debugName/* = _T("CommandLine")*/,bool real_path = false);
+
 
         /** @brief Loads a string buffer and captures its output.
           *
@@ -221,6 +227,9 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
         	cbThrow(_T("Can't assign a ScriptingManager* !!!"));
         	return *this;
 		}
+
+        void ParseDebuggerCMDLine(wxString cmd_line);
+
     private:
         // needed for SqPlus bindings
         ScriptingManager(cb_unused const ScriptingManager& rhs); // prevent copy construction
@@ -228,6 +237,9 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
         void OnScriptMenu(wxCommandEvent& event);
         void OnScriptPluginMenu(wxCommandEvent& event);
         void RegisterScriptFunctions();
+        void OnDebugTimer(wxTimerEvent& event);
+
+        wxTimer m_DebugerUpdateTimer;
 
         ScriptingManager();
         ~ScriptingManager() override;
@@ -251,6 +263,11 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
         IncludeSet m_IncludeSet;
 
         MenuItemsManager m_MenuItemsManager;
+
+
+        bool m_enable_debugger;
+        HSQREMOTEDBG m_rdbg;
+        IncludeSet m_debugger_created_temp_files;
 
         DECLARE_EVENT_TABLE()
 };

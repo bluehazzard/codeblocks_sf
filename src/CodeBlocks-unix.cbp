@@ -3090,6 +3090,12 @@
 		<Unit filename="sdk/scripting/squirrel/sqcompiler.cpp">
 			<Option target="Squirrel" />
 		</Unit>
+		<Unit filename="sdk/scripting/squirrel/sqdbgserver.cpp">
+			<Option target="Squirrel" />
+		</Unit>
+		<Unit filename="sdk/scripting/squirrel/sqdbgserver.h">
+			<Option target="Squirrel" />
+		</Unit>
 		<Unit filename="sdk/scripting/squirrel/sqdebug.cpp">
 			<Option target="Squirrel" />
 		</Unit>
@@ -3103,6 +3109,12 @@
 			<Option target="Squirrel" />
 		</Unit>
 		<Unit filename="sdk/scripting/squirrel/sqobject.cpp">
+			<Option target="Squirrel" />
+		</Unit>
+		<Unit filename="sdk/scripting/squirrel/sqrdbg.cpp">
+			<Option target="Squirrel" />
+		</Unit>
+		<Unit filename="sdk/scripting/squirrel/sqrdbg.h">
 			<Option target="Squirrel" />
 		</Unit>
 		<Unit filename="sdk/scripting/squirrel/sqstate.cpp">

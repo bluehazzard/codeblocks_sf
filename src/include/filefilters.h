@@ -110,6 +110,7 @@ namespace FileFilters
     extern const DLLIMPORT wxString RESOURCEBIN_EXT;
     extern const DLLIMPORT wxString XML_EXT;
     extern const DLLIMPORT wxString SCRIPT_EXT;
+    extern const DLLIMPORT wxString SQ_SCRIPT_EXT;
 
     // a dot *and* the extension, e.g. ".exe"
     extern const DLLIMPORT wxString WORKSPACE_DOT_EXT;
@@ -159,6 +160,7 @@ namespace FileFilters
     extern const DLLIMPORT wxString RESOURCEBIN_DOT_EXT;
     extern const DLLIMPORT wxString XML_DOT_EXT;
     extern const DLLIMPORT wxString SCRIPT_DOT_EXT;
+    extern const DLLIMPORT wxString SQ_SCRIPT_DOT_EXT;
 }
 
 #endif // FILEFILTERS_H

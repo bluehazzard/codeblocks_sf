@@ -148,6 +148,8 @@
 					<Add library="sqstdlib" />
 					<Add library="squirrel" />
 					<Add library="gdi32" />
+					<Add library="WSOCK32" />
+					<Add library="ws2_32" />
 					<Add directory="devel30" />
 					<Add directory="sdk/scripting/lib" />
 				</Linker>
@@ -166,7 +168,7 @@
 				<Option external_deps="devel30/libcodeblocks.a;" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters="--debug-log --no-dde --no-check-associations --multiple-instance --no-splash-screen --verbose -p debug" />
+				<Option parameters="--debug-log --no-dde --no-check-associations --multiple-instance --no-splash-screen --verbose -p debug -sdbg=5351:h" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-DBUILDING_PLUGIN" />
@@ -3314,6 +3316,9 @@
 		<Unit filename="sdk/scripting/squirrel/sqcompiler.cpp">
 			<Option target="Squirrel" />
 		</Unit>
+		<Unit filename="sdk/scripting/squirrel/sqdbgserver.cpp">
+			<Option target="Squirrel" />
+		</Unit>
 		<Unit filename="sdk/scripting/squirrel/sqdebug.cpp">
 			<Option target="Squirrel" />
 		</Unit>
@@ -3327,6 +3332,9 @@
 			<Option target="Squirrel" />
 		</Unit>
 		<Unit filename="sdk/scripting/squirrel/sqobject.cpp">
+			<Option target="Squirrel" />
+		</Unit>
+		<Unit filename="sdk/scripting/squirrel/sqrdbg.cpp">
 			<Option target="Squirrel" />
 		</Unit>
 		<Unit filename="sdk/scripting/squirrel/sqstate.cpp">

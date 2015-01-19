@@ -277,6 +277,8 @@ const wxCmdLineEntryDesc cmdLineDesc[] =
       wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_NEEDS_SEPARATOR },
     { wxCMD_LINE_PARAM,  CMD_ENTRY(""),   CMD_ENTRY(""),                      CMD_ENTRY("filename(s)"),
       wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_PARAM_MULTIPLE },
+    { wxCMD_LINE_OPTION, CMD_ENTRY("sdbg"),   CMD_ENTRY("sq-dbg-enable"),     CMD_ENTRY("enable the squirrel debug interface. This is a ':' separated list of options:\n The first parameter is the port number\nIf second parameter is 'h' the debugger halts c::b until a debugger connects to the port, if it is 'r' c::b will load and run normally (ex.: 8381:h )"),
+      wxCMD_LINE_VAL_STRING, wxCMD_LINE_NEEDS_SEPARATOR },
     { wxCMD_LINE_NONE }
 };
 #endif // wxUSE_CMDLINE_PARSER
@@ -749,7 +751,7 @@ bool CodeBlocksApp::OnInit()
             LoaderBase* loader = Manager::Get()->GetFileManager()->Load(m_Script);
 
             if (loader->GetData())
-                Manager::Get()->GetScriptingManager()->LoadBuffer(cbC2U(loader->GetData()));
+                Manager::Get()->GetScriptingManager()->LoadBuffer(cbC2U(loader->GetData()), _("init_script"));
 
             delete loader;
             frame->Close();
@@ -1198,6 +1200,15 @@ int CodeBlocksApp::ParseCmdLine(MainFrame* handlerFrame, const wxString& CmdLine
             m_Clean                = parser.Found(_T("clean"));
             parser.Found(_T("target"), &m_BatchTarget);
             parser.Found(_T("script"), &m_Script);
+
+            wxString sq_dbg_cmd_line;
+            if(parser.Found(_T("sq-dbg-enable"),&sq_dbg_cmd_line) != false)
+            {
+                Manager::Get()->GetScriptingManager()->ParseDebuggerCMDLine(sq_dbg_cmd_line);
+            }
+
+
+
             // initial setting for batch flag (will be reset when ParseCmdLine() is called again).
             m_Batch = m_Build || m_ReBuild || m_Clean;
 

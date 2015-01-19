@@ -969,7 +969,7 @@ bool ProjectOptionsDlg::IsScriptValid(ProjectBuildTarget* target, const wxString
         wxString script_nomacro = script;
         Manager::Get()->GetMacrosManager()->ReplaceMacros(script_nomacro, target);
         script_nomacro = wxFileName(script_nomacro).IsAbsolute() ? script_nomacro : m_Project->GetBasePath() + wxFILE_SEP_PATH + script_nomacro;
-        Manager::Get()->GetScriptingManager()->LoadBuffer(clearout_buildscripts); // clear previous script's context
+        Manager::Get()->GetScriptingManager()->LoadBuffer(clearout_buildscripts, wxT("Clear_build_script")); // clear previous script's context
         Manager::Get()->GetScriptingManager()->LoadScript(script_nomacro);
         SqPlus::SquirrelFunction<void> setopts("SetBuildOptions");
 
