@@ -110,7 +110,9 @@ DEFINE_EVENT_TYPE( wxEVT_SCI_MARGINCLICK );
 DEFINE_EVENT_TYPE( wxEVT_SCI_NEEDSHOWN );
 DEFINE_EVENT_TYPE( wxEVT_SCI_PAINTED );
 DEFINE_EVENT_TYPE( wxEVT_SCI_USERLISTSELECTION );
+#if !WXWIN_COMPATIBILITY_3_0
 DEFINE_EVENT_TYPE( wxEVT_SCI_URIDROPPED );
+#endif // WXWIN_COMPATIBILITY_3_0
 DEFINE_EVENT_TYPE( wxEVT_SCI_DWELLSTART );
 DEFINE_EVENT_TYPE( wxEVT_SCI_DWELLEND );
 DEFINE_EVENT_TYPE( wxEVT_SCI_START_DRAG );
@@ -5272,6 +5274,7 @@ void wxScintilla::AppendTextRaw(const char* text, int length)
 
 #if WXWIN_COMPATIBILITY_3_0
 // Deprecated since Scintilla 3.7.2
+#if 0
 void wxScintilla::UsePopUp(bool allowPopUp)
 {
     SendMsg(SCI_USEPOPUP, allowPopUp ? SC_POPUP_ALL : SC_POPUP_NEVER, 0);
@@ -5284,6 +5287,7 @@ void wxScintilla::StartStyling(int start, int unused)
 
         SendMsg(SCI_STARTSTYLING, start, unused);
 }
+#endif // 0
 #endif // WXWIN_COMPATIBILITY_3_0
 
 //----------------------------------------------------------------------
