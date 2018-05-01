@@ -7,19 +7,30 @@
 #define CBEDITORPRINTOUT_H
 
 #include <wx/print.h>
+#include <vector>
 
 class cbStyledTextCtrl;
+
 
 class cbEditorPrintout : public wxPrintout
 {
     public:
         cbEditorPrintout(const wxString& title, cbStyledTextCtrl* control, bool selectionOnly);
         ~cbEditorPrintout();
+        void AddEditor(cbStyledTextCtrl* control);
         bool OnPrintPage(int page);
         bool HasPage(int page);
         void GetPageInfo(int *minPage, int *maxPage, int *selPageFrom, int *selPageTo);
         bool OnBeginDocument(int startPage, int endPage);
     protected:
+
+        struct PageInfo
+        {
+            cbStyledTextCtrl* editor;
+            int start;
+            int end;
+        };
+
         bool ScaleDC(wxDC *dc);
         cbStyledTextCtrl* m_TextControl;
         wxRect m_pageRect;
@@ -28,6 +39,11 @@ class cbEditorPrintout : public wxPrintout
         int m_SelStart;
         int m_SelEnd;
         wxArrayInt* m_pPageSelStart;
+
+        bool m_selectionOnly;
+
+        std::vector<PageInfo> m_pageInfo;
+        std::vector<cbStyledTextCtrl*> m_editors;
 };
 
 #endif // CBEDITORPRINTOUT_H

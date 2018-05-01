@@ -2940,16 +2940,16 @@ void cbEditor::OnAfterBuildContextMenu(cb_unused ModuleType type)
     // we don't care
 }
 
-void cbEditor::Print(bool selectionOnly, PrintColourMode pcm, bool line_numbers)
+void cbEditor::BeginPrint(PrintColourMode pcm, bool line_numbers)
 {
     cbStyledTextCtrl * control = GetControl();
     if (!control)
         return;
 
     // Remember same settings, so we can restore them.
-    int oldMarginWidth = control->GetMarginWidth(C_LINE_MARGIN);
-    int oldMarginType = control->GetMarginType(C_LINE_MARGIN);
-    int oldEdgeMode = control->GetEdgeMode();
+    m_tempPrintStorage.oldMarginWidth = control->GetMarginWidth(C_LINE_MARGIN);
+    m_tempPrintStorage.oldMarginType = control->GetMarginType(C_LINE_MARGIN);
+    m_tempPrintStorage.oldEdgeMode = control->GetEdgeMode();
 
     // print line numbers?
     control->SetMarginType(C_LINE_MARGIN, wxSCI_MARGIN_NUMBER);
@@ -2983,6 +2983,32 @@ void cbEditor::Print(bool selectionOnly, PrintColourMode pcm, bool line_numbers)
         default:
             break;
     }
+}
+
+void cbEditor::EndPrint()
+{
+    cbStyledTextCtrl * control = GetControl();
+    if (!control)
+        return;
+    // revert line number settings
+    control->SetMarginType(C_LINE_MARGIN, m_tempPrintStorage.oldMarginType);
+    control->SetMarginWidth(C_LINE_MARGIN, m_tempPrintStorage.oldMarginWidth);
+
+    // revert gutter settings
+    control->SetEdgeMode(m_tempPrintStorage.oldEdgeMode);
+
+    // restore line numbers if needed
+    m_pData->SetLineNumberColWidth(m_pControl && m_pControl2);
+}
+
+void cbEditor::Print(bool selectionOnly, PrintColourMode pcm, bool line_numbers)
+{
+    cbStyledTextCtrl * control = GetControl();
+    if (!control)
+        return;
+
+    BeginPrint(pcm,line_numbers);
+
     InitPrinting();
     cbEditorPrintout printout(m_Filename, control, selectionOnly);
     if (!g_printer->Print(this, &printout, true))
@@ -3001,15 +3027,8 @@ void cbEditor::Print(bool selectionOnly, PrintColourMode pcm, bool line_numbers)
         Manager::Get()->GetConfigManager(_T("app"))->Write(_T("/printerdialog/paperorientation"), (int)ppd->GetOrientation());
     }
 
-    // revert line number settings
-    control->SetMarginType(C_LINE_MARGIN, oldMarginType);
-    control->SetMarginWidth(C_LINE_MARGIN, oldMarginWidth);
+    EndPrint();
 
-    // revert gutter settings
-    control->SetEdgeMode(oldEdgeMode);
-
-    // restore line numbers if needed
-    m_pData->SetLineNumberColWidth(m_pControl && m_pControl2);
 }
 
 // events

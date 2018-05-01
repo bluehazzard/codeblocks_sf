@@ -197,6 +197,9 @@ class DLLIMPORT cbEditor : public EditorBase
           */
         void Print(bool selectionOnly, PrintColourMode pcm, bool line_numbers);
 
+        void BeginPrint(PrintColourMode pcm, bool line_numbers);
+        void EndPrint();
+
         /** This method is obsolete, use the abbreviations plugin instead. */
         void AutoComplete();
 
@@ -369,6 +372,12 @@ class DLLIMPORT cbEditor : public EditorBase
 
         void BreakpointMarkerToggle(int line);
 
+        struct PrintOldValues
+        {
+            int oldMarginWidth;
+            int oldMarginType;
+            int oldEdgeMode;
+        };
         // variables
         bool m_IsOK;
         wxSplitterWindow* m_pSplitter;
@@ -385,6 +394,7 @@ class DLLIMPORT cbEditor : public EditorBase
         HighlightLanguage m_lang;
         wxDateTime m_LastModified; // to check if the file was modified outside the editor
         bool m_autoIndentDone;
+        PrintOldValues m_tempPrintStorage;
 
         // DO NOT ADD ANY MORE VARIABLES HERE!
         // ADD THEM IN cbEditorInternalData INSTEAD!

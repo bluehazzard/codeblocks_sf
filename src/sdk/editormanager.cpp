@@ -31,6 +31,7 @@
     #include "projectbuildtarget.h"
     #include "projectmanager.h"
     #include "sdk_events.h"
+    #include "cbeditorprintout.h"
 #endif
 
 #include "annoyingdialog.h"
@@ -822,12 +823,42 @@ void EditorManager::Print(PrintScope ps, PrintColourMode pcm, bool line_numbers)
     {
     case psAllOpenEditors:
         {
+            InitPrinting();
+            cbEditorPrintout printout(_("Code::Blocks"), nullptr, false);
             for (size_t i = 0; i < m_pNotebook->GetPageCount(); ++i)
             {
                 cbEditor* ed = InternalGetBuiltinEditor(i);
-                if (ed)
-                    ed->Print(false, pcm, line_numbers);
+                if(ed == nullptr)
+                    continue;
+
+                ed->BeginPrint(pcm, line_numbers);
+                printout.AddEditor(ed->GetControl());
+
             }
+
+            if (!g_printer->Print( nullptr , &printout, true))
+            {
+                if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
+                {
+                    cbMessageBox(_("There was a problem printing.\n"
+                                    "Perhaps your current printer is not set correctly?"), _("Printing"), wxICON_ERROR);
+                    DeInitPrinting();
+                }
+            }
+            else
+            {
+                wxPrintData* ppd = &(g_printer->GetPrintDialogData().GetPrintData());
+                Manager::Get()->GetConfigManager(_T("app"))->Write(_T("/printerdialog/paperid"), (int)ppd->GetPaperId());
+                Manager::Get()->GetConfigManager(_T("app"))->Write(_T("/printerdialog/paperorientation"), (int)ppd->GetOrientation());
+            }
+            for (size_t i = 0; i < m_pNotebook->GetPageCount(); ++i)
+            {
+                cbEditor* ed = InternalGetBuiltinEditor(i);
+                if(ed == nullptr)
+                    continue;
+                ed->EndPrint();
+            }
+
             break;
         }
     case psActiveEditor: // fall through
