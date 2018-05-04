@@ -115,6 +115,15 @@ void cbEditorPrintout::GetPageInfo(int *minPage, int *maxPage, int *selPageFrom,
 
     wxPrintData* ppd = &(g_printer->GetPrintDialogData().GetPrintData());
     // We cannot use GetSize from wxPrintData, because it always returns -1 for page.x and page.y,
+
+    if(ppd->GetPaperId() == wxPAPER_NONE)
+    {
+        cbMessageBox(_("No paper format specified from printer. Using DIN-A4 as default."),
+                     _("WARNING: No paper format defined"),
+                     wxICON_WARNING | wxOK);
+        ppd->SetPaperId(wxPAPER_A4);
+    }
+
     wxPrintPaperDatabase paperDB;
     paperDB.CreateDatabase();
     wxSize page=paperDB.GetSize(ppd->GetPaperId());
