@@ -826,6 +826,7 @@ void EditorManager::PrintQueueEditor(cbEditorPrintout& printout, PrintColourMode
             return;//continue;
 
         // print line numbers?
+        control->Hide();
         control->SetMarginType(C_LINE_MARGIN, wxSCI_MARGIN_NUMBER);
         if (!line_numbers)
         {
