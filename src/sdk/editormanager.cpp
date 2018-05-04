@@ -817,46 +817,65 @@ bool EditorManager::SaveAll()
     return true;
 }
 
+void EditorManager::PrintQueueEditor(cbEditorPrintout& printout, PrintColourMode pcm, bool line_numbers, cbEditor* ed, bool selection)
+{
+    //for(auto itr = ed.begin(); itr != ed.end(); ++itr)
+    {
+        cbStyledTextCtrl* control = ed->Clone();
+        if (!control)
+            return;//continue;
+
+        // print line numbers?
+        control->SetMarginType(C_LINE_MARGIN, wxSCI_MARGIN_NUMBER);
+        if (!line_numbers)
+        {
+            control->SetPrintMagnification(-1);
+            control->SetMarginWidth(C_LINE_MARGIN, 0);
+        }
+        else
+        {
+            control->SetPrintMagnification(-2);
+            control->SetMarginWidth(C_LINE_MARGIN, 1);
+        }
+        // never print the gutter line
+        control->SetEdgeMode(wxSCI_EDGE_NONE);
+
+        switch (pcm)
+        {
+            case pcmAsIs:
+                control->SetPrintColourMode(wxSCI_PRINT_NORMAL);
+                break;
+            case pcmBlackAndWhite:
+                control->SetPrintColourMode(wxSCI_PRINT_BLACKONWHITE);
+                break;
+            case pcmColourOnWhite:
+                control->SetPrintColourMode(wxSCI_PRINT_COLOURONWHITE);
+                break;
+            case pcmInvertColours:
+                control->SetPrintColourMode(wxSCI_PRINT_INVERTLIGHT);
+                break;
+            default:
+                break;
+        }
+        printout.AddEditor(control);
+    }
+}
+
 void EditorManager::Print(PrintScope ps, PrintColourMode pcm, bool line_numbers)
 {
+    InitPrinting();
+    cbEditorPrintout printout(_("Code::Blocks"), nullptr, false);
     switch (ps)
     {
     case psAllOpenEditors:
         {
-            InitPrinting();
-            cbEditorPrintout printout(_("Code::Blocks"), nullptr, false);
             for (size_t i = 0; i < m_pNotebook->GetPageCount(); ++i)
             {
                 cbEditor* ed = InternalGetBuiltinEditor(i);
                 if(ed == nullptr)
                     continue;
 
-                ed->BeginPrint(pcm, line_numbers);
-                printout.AddEditor(ed->GetControl());
-
-            }
-
-            if (!g_printer->Print( nullptr , &printout, true))
-            {
-                if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
-                {
-                    cbMessageBox(_("There was a problem printing.\n"
-                                    "Perhaps your current printer is not set correctly?"), _("Printing"), wxICON_ERROR);
-                    DeInitPrinting();
-                }
-            }
-            else
-            {
-                wxPrintData* ppd = &(g_printer->GetPrintDialogData().GetPrintData());
-                Manager::Get()->GetConfigManager(_T("app"))->Write(_T("/printerdialog/paperid"), (int)ppd->GetPaperId());
-                Manager::Get()->GetConfigManager(_T("app"))->Write(_T("/printerdialog/paperorientation"), (int)ppd->GetOrientation());
-            }
-            for (size_t i = 0; i < m_pNotebook->GetPageCount(); ++i)
-            {
-                cbEditor* ed = InternalGetBuiltinEditor(i);
-                if(ed == nullptr)
-                    continue;
-                ed->EndPrint();
+                PrintQueueEditor(printout, pcm, line_numbers,ed,false);
             }
 
             break;
@@ -867,9 +886,25 @@ void EditorManager::Print(PrintScope ps, PrintColourMode pcm, bool line_numbers)
         {
             cbEditor* ed = GetBuiltinEditor(GetActiveEditor());
             if (ed)
-                ed->Print(ps == psSelection, pcm, line_numbers);
+                PrintQueueEditor(printout, pcm, line_numbers, ed, ps == psSelection);
             break;
         }
+    }
+
+    if (!g_printer->Print( nullptr , &printout, true))
+    {
+        if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
+        {
+            cbMessageBox(_("There was a problem printing.\n"
+                           "Perhaps your current printer is not set correctly?"), _("Printing"), wxICON_ERROR);
+            DeInitPrinting();
+        }
+    }
+    else
+    {
+        wxPrintData* ppd = &(g_printer->GetPrintDialogData().GetPrintData());
+        Manager::Get()->GetConfigManager(_T("app"))->Write(_T("/printerdialog/paperid"), (int)ppd->GetPaperId());
+        Manager::Get()->GetConfigManager(_T("app"))->Write(_T("/printerdialog/paperorientation"), (int)ppd->GetOrientation());
     }
 }
 

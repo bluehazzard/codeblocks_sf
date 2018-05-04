@@ -664,7 +664,7 @@ namespace ScriptBindings
                 func(&cbEditor::GetLineIndentString, "GetLineIndentString").
                 func(&cbEditor::Touch, "Touch").
                 func(&cbEditor::Reload, "Reload").
-                func(&cbEditor::Print, "Print").
+                //func(&cbEditor::Print, "Print").
                 func(&cbEditor::AutoComplete, "AutoComplete").
                 func(&cbEditor::AddBreakpoint, "AddBreakpoint").
                 func(&cbEditor::RemoveBreakpoint, "RemoveBreakpoint").

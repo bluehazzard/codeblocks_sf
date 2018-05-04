@@ -15,7 +15,7 @@ class cbStyledTextCtrl;
 class cbEditorPrintout : public wxPrintout
 {
     public:
-        cbEditorPrintout(const wxString& title, cbStyledTextCtrl* control, bool selectionOnly);
+        cbEditorPrintout(const wxString& title, cbStyledTextCtrl* control, bool selectionOnly, bool destroy = true);
         ~cbEditorPrintout();
         void AddEditor(cbStyledTextCtrl* control);
         bool OnPrintPage(int page);
@@ -41,6 +41,7 @@ class cbEditorPrintout : public wxPrintout
         wxArrayInt* m_pPageSelStart;
 
         bool m_selectionOnly;
+        bool m_destroyOnDestruct;
 
         std::vector<PageInfo> m_pageInfo;
         std::vector<cbStyledTextCtrl*> m_editors;

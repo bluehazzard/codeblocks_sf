@@ -66,10 +66,6 @@ const wxString g_EditorModified = _T("*");
 #define DEBUG_MARKER               6
 #define DEBUG_MARKER_HIGHLIGHT     7
 
-#define C_LINE_MARGIN      0 // Line numbers
-#define C_MARKER_MARGIN    1 // Bookmarks, Breakpoints...
-#define C_CHANGEBAR_MARGIN 2
-#define C_FOLDING_MARGIN   3
 
 /* This struct holds private data for the cbEditor class.
  * It's a paradigm to avoid rebuilding the entire project (as cbEditor is a basic dependency)
@@ -1079,6 +1075,35 @@ void cbEditor::ConnectEvents(cbStyledTextCtrl* stc)
     }
 }
 
+cbStyledTextCtrl* cbEditor::Clone()
+{
+    cbStyledTextCtrl* ret = CreateEditor();
+    // update controls' look'n'feel
+    // do it here (before) document is attached, speeds up syntaxhighlighting
+    // we do not call "SetEditorStyleAfterFileOpen" here because it calls SetLanguage for the already loaded text inside
+    // the left control and slows down loading of large files a lot.
+    InternalSetEditorStyleBeforeFileOpen(ret);
+
+    // make sure basic settings of indicators (maybe set by plugins) are used for the new control
+    for (int i = 0; i < wxSCI_INDIC_MAX; ++i )
+    {
+        ret->IndicatorSetStyle(i, m_pControl->IndicatorGetStyle(i));
+        ret->IndicatorSetUnder(i, m_pControl->IndicatorGetUnder(i));
+        ret->IndicatorSetForeground(i, m_pControl->IndicatorGetForeground(i));
+    }
+
+    ret->SetDocPointer(m_pControl->GetDocPointer());
+    if (m_pTheme)
+    {
+        m_pTheme->Apply(m_lang, ret, false, true);
+        SetLanguageDependentColours(*ret);
+    }
+    ret->SetMarginWidth(C_LINE_MARGIN, m_pControl->GetMarginWidth(C_LINE_MARGIN));
+
+    return ret;
+
+}
+
 void cbEditor::Split(cbEditor::SplitType split)
 {
     Freeze();
@@ -1104,34 +1129,14 @@ void cbEditor::Split(cbEditor::SplitType split)
     m_pSplitter->SetMinimumPaneSize(32);
 
     // create the right control
-    m_pControl2 = CreateEditor();
+    m_pControl2 = Clone();
 
-    // update controls' look'n'feel
-    // do it here (before) document is attached, speeds up syntaxhighlighting
-    // we do not call "SetEditorStyleAfterFileOpen" here because it calls SetLanguage for the already loaded text inside
-    // the left control and slows down loading of large files a lot.
-    InternalSetEditorStyleBeforeFileOpen(m_pControl2);
 
-    // make sure basic settings of indicators (maybe set by plugins) are used for the new control
-    for (int i = 0; i < wxSCI_INDIC_MAX; ++i )
-    {
-        m_pControl2->IndicatorSetStyle(i, m_pControl->IndicatorGetStyle(i));
-        m_pControl2->IndicatorSetUnder(i, m_pControl->IndicatorGetUnder(i));
-        m_pControl2->IndicatorSetForeground(i, m_pControl->IndicatorGetForeground(i));
-    }
 
     ConfigManager* mgr = Manager::Get()->GetConfigManager(_T("editor"));
     SetFoldingIndicator(mgr->ReadInt(_T("/folding/indicator"), 2));
     UnderlineFoldedLines(mgr->ReadBool(_T("/folding/underline_folded_line"), true));
 
-    if (m_pTheme)
-    {
-        m_pTheme->Apply(m_lang, m_pControl2, false, true);
-        SetLanguageDependentColours(*m_pControl2);
-    }
-
-    // and make it a live copy of left control
-    m_pControl2->SetDocPointer(m_pControl->GetDocPointer());
 
     // on wxGTK > 2.9 we need to thaw before reparent and refreeze the editor here or the whole app stays frozen
     #if defined ( __WXGTK__ ) && wxCHECK_VERSION(3, 0, 0)
@@ -2939,7 +2944,7 @@ void cbEditor::OnAfterBuildContextMenu(cb_unused ModuleType type)
 {
     // we don't care
 }
-
+/*
 void cbEditor::BeginPrint(PrintColourMode pcm, bool line_numbers)
 {
     cbStyledTextCtrl * control = GetControl();
@@ -3030,7 +3035,7 @@ void cbEditor::Print(bool selectionOnly, PrintColourMode pcm, bool line_numbers)
     EndPrint();
 
 }
-
+*/
 // events
 
 void cbEditor::OnContextMenuEntry(wxCommandEvent& event)

@@ -15,6 +15,11 @@
 #include "editorbase.h"
 #include "printing_types.h"
 
+#define C_LINE_MARGIN      0 // Line numbers
+#define C_MARKER_MARGIN    1 // Bookmarks, Breakpoints...
+#define C_CHANGEBAR_MARGIN 2
+#define C_FOLDING_MARGIN   3
+
 extern const wxString g_EditorModified;
 
 // forward decls
@@ -195,10 +200,10 @@ class DLLIMPORT cbEditor : public EditorBase
           * @param pcm The colour mode to use when printing
           * @param line_numbers Print the line numbers of file, too.
           */
-        void Print(bool selectionOnly, PrintColourMode pcm, bool line_numbers);
+        //void Print(bool selectionOnly, PrintColourMode pcm, bool line_numbers);
 
-        void BeginPrint(PrintColourMode pcm, bool line_numbers);
-        void EndPrint();
+        //void BeginPrint(PrintColourMode pcm, bool line_numbers);
+        //void EndPrint();
 
         /** This method is obsolete, use the abbreviations plugin instead. */
         void AutoComplete();
@@ -313,6 +318,8 @@ class DLLIMPORT cbEditor : public EditorBase
         static void ApplyStyles(cbStyledTextCtrl* control);
 
         void AutoIndentDone();
+
+        cbStyledTextCtrl* Clone();
 
         /// Applies the styles that match the filename of the editor.
         /// Should be called after new file is created. Calling SaveAs does the same thing.

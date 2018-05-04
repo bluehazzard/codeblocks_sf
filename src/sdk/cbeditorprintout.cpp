@@ -22,14 +22,15 @@
 #include "printing_types.h"
 #include <wx/paper.h>
 
-cbEditorPrintout::cbEditorPrintout(const wxString& title, cbStyledTextCtrl* control, bool selectionOnly)
+cbEditorPrintout::cbEditorPrintout(const wxString& title, cbStyledTextCtrl* control, bool selectionOnly, bool destroy)
         : wxPrintout(title),
         m_TextControl(control),
-        m_selectionOnly(selectionOnly)
+        m_selectionOnly(selectionOnly),
+        m_destroyOnDestruct(destroy)
 {
     // ctor
     m_SelStart = 0;
-    if(control != nullptr)
+    if (control != nullptr)
     {
         m_SelEnd = control->GetLength();
         if (selectionOnly && !control->GetSelectedText().IsEmpty())
@@ -44,8 +45,15 @@ cbEditorPrintout::cbEditorPrintout(const wxString& title, cbStyledTextCtrl* cont
 cbEditorPrintout::~cbEditorPrintout()
 {
     // dtor
-    //delete m_pPageSelStart;
-    //m_pPageSelStart = nullptr;
+    if (m_destroyOnDestruct)
+    {
+        for (auto itr = m_editors.begin(); itr != m_editors.end(); ++itr)
+        {
+            if(*itr)
+                (*itr)->Destroy();
+            (*itr) = nullptr;
+        }
+    }
 }
 
 void cbEditorPrintout::AddEditor(cbStyledTextCtrl* control)

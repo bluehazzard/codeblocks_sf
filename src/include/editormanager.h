@@ -17,6 +17,7 @@
 #include "cbexception.h" // cbThrow
 
 #include "printing_types.h"
+#include "cbeditorprintout.h"
 
 #include "globals.h" // cbC2U, FileType
 
@@ -136,6 +137,7 @@ class DLLIMPORT EditorManager : public Mgr<EditorManager>, public wxEvtHandler
         bool SaveActiveAs();
         bool SaveAll();
 
+        void PrintQueueEditor(cbEditorPrintout& printout, PrintColourMode pcm, bool line_numbers, cbEditor* ed, bool selection);
         void Print(PrintScope ps, PrintColourMode pcm, bool line_numbers);
 
         /** Hides the editor notebook for layout purposes */
