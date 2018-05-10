@@ -15,7 +15,7 @@ class cbStyledTextCtrl;
 class cbEditorPrintout : public wxPrintout
 {
     public:
-        cbEditorPrintout(const wxString& title, cbStyledTextCtrl* control, bool selectionOnly, bool destroy = true);
+        cbEditorPrintout(const wxString& title, bool selectionOnly, bool destroy = true);
         ~cbEditorPrintout();
         void AddEditor(cbStyledTextCtrl* control);
         bool OnPrintPage(int page);
@@ -32,13 +32,8 @@ class cbEditorPrintout : public wxPrintout
         };
 
         bool ScaleDC(wxDC *dc);
-        cbStyledTextCtrl* m_TextControl;
         wxRect m_pageRect;
         wxRect m_printRect;
-        int m_printed;
-        int m_SelStart;
-        int m_SelEnd;
-        wxArrayInt* m_pPageSelStart;
 
         bool m_selectionOnly;
         bool m_destroyOnDestruct;

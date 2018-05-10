@@ -1075,7 +1075,7 @@ void cbEditor::ConnectEvents(cbStyledTextCtrl* stc)
     }
 }
 
-cbStyledTextCtrl* cbEditor::Clone()
+cbStyledTextCtrl* cbEditor::CloneTextCtrl()
 {
     cbStyledTextCtrl* ret = CreateEditor();
     // update controls' look'n'feel
@@ -1099,6 +1099,12 @@ cbStyledTextCtrl* cbEditor::Clone()
         SetLanguageDependentColours(*ret);
     }
     ret->SetMarginWidth(C_LINE_MARGIN, m_pControl->GetMarginWidth(C_LINE_MARGIN));
+
+    // clone also the selection
+    long from = 0, to = 0;
+    m_pControl->GetSelection(&from, &to);
+    ret->SetSelection(from, to);
+
 
     return ret;
 
@@ -1129,9 +1135,7 @@ void cbEditor::Split(cbEditor::SplitType split)
     m_pSplitter->SetMinimumPaneSize(32);
 
     // create the right control
-    m_pControl2 = Clone();
-
-
+    m_pControl2 = CloneTextCtrl();
 
     ConfigManager* mgr = Manager::Get()->GetConfigManager(_T("editor"));
     SetFoldingIndicator(mgr->ReadInt(_T("/folding/indicator"), 2));
@@ -2944,98 +2948,7 @@ void cbEditor::OnAfterBuildContextMenu(cb_unused ModuleType type)
 {
     // we don't care
 }
-/*
-void cbEditor::BeginPrint(PrintColourMode pcm, bool line_numbers)
-{
-    cbStyledTextCtrl * control = GetControl();
-    if (!control)
-        return;
 
-    // Remember same settings, so we can restore them.
-    m_tempPrintStorage.oldMarginWidth = control->GetMarginWidth(C_LINE_MARGIN);
-    m_tempPrintStorage.oldMarginType = control->GetMarginType(C_LINE_MARGIN);
-    m_tempPrintStorage.oldEdgeMode = control->GetEdgeMode();
-
-    // print line numbers?
-    control->SetMarginType(C_LINE_MARGIN, wxSCI_MARGIN_NUMBER);
-    if (!line_numbers)
-    {
-        control->SetPrintMagnification(-1);
-        control->SetMarginWidth(C_LINE_MARGIN, 0);
-    }
-    else
-    {
-        control->SetPrintMagnification(-2);
-        control->SetMarginWidth(C_LINE_MARGIN, 1);
-    }
-    // never print the gutter line
-    control->SetEdgeMode(wxSCI_EDGE_NONE);
-
-    switch (pcm)
-    {
-        case pcmAsIs:
-            control->SetPrintColourMode(wxSCI_PRINT_NORMAL);
-            break;
-        case pcmBlackAndWhite:
-            control->SetPrintColourMode(wxSCI_PRINT_BLACKONWHITE);
-            break;
-        case pcmColourOnWhite:
-            control->SetPrintColourMode(wxSCI_PRINT_COLOURONWHITE);
-            break;
-        case pcmInvertColours:
-            control->SetPrintColourMode(wxSCI_PRINT_INVERTLIGHT);
-            break;
-        default:
-            break;
-    }
-}
-
-void cbEditor::EndPrint()
-{
-    cbStyledTextCtrl * control = GetControl();
-    if (!control)
-        return;
-    // revert line number settings
-    control->SetMarginType(C_LINE_MARGIN, m_tempPrintStorage.oldMarginType);
-    control->SetMarginWidth(C_LINE_MARGIN, m_tempPrintStorage.oldMarginWidth);
-
-    // revert gutter settings
-    control->SetEdgeMode(m_tempPrintStorage.oldEdgeMode);
-
-    // restore line numbers if needed
-    m_pData->SetLineNumberColWidth(m_pControl && m_pControl2);
-}
-
-void cbEditor::Print(bool selectionOnly, PrintColourMode pcm, bool line_numbers)
-{
-    cbStyledTextCtrl * control = GetControl();
-    if (!control)
-        return;
-
-    BeginPrint(pcm,line_numbers);
-
-    InitPrinting();
-    cbEditorPrintout printout(m_Filename, control, selectionOnly);
-    if (!g_printer->Print(this, &printout, true))
-    {
-        if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
-        {
-            cbMessageBox(_("There was a problem printing.\n"
-                            "Perhaps your current printer is not set correctly?"), _("Printing"), wxICON_ERROR);
-            DeInitPrinting();
-        }
-    }
-    else
-    {
-        wxPrintData* ppd = &(g_printer->GetPrintDialogData().GetPrintData());
-        Manager::Get()->GetConfigManager(_T("app"))->Write(_T("/printerdialog/paperid"), (int)ppd->GetPaperId());
-        Manager::Get()->GetConfigManager(_T("app"))->Write(_T("/printerdialog/paperorientation"), (int)ppd->GetOrientation());
-    }
-
-    EndPrint();
-
-}
-*/
 // events
 
 void cbEditor::OnContextMenuEntry(wxCommandEvent& event)

@@ -195,16 +195,6 @@ class DLLIMPORT cbEditor : public EditorBase
         /** Reloads the file from disk. @return True on success, False on failure. */
         bool Reload(bool detectEncoding = true);
 
-        /** Print the file.
-          * @param selectionOnly Should the selected text be printed only?
-          * @param pcm The colour mode to use when printing
-          * @param line_numbers Print the line numbers of file, too.
-          */
-        //void Print(bool selectionOnly, PrintColourMode pcm, bool line_numbers);
-
-        //void BeginPrint(PrintColourMode pcm, bool line_numbers);
-        //void EndPrint();
-
         /** This method is obsolete, use the abbreviations plugin instead. */
         void AutoComplete();
 
@@ -319,7 +309,8 @@ class DLLIMPORT cbEditor : public EditorBase
 
         void AutoIndentDone();
 
-        cbStyledTextCtrl* Clone();
+        /// return a cloned cbStyledTextCtrl from m_pControl
+        cbStyledTextCtrl* CloneTextCtrl();
 
         /// Applies the styles that match the filename of the editor.
         /// Should be called after new file is created. Calling SaveAs does the same thing.
@@ -379,12 +370,6 @@ class DLLIMPORT cbEditor : public EditorBase
 
         void BreakpointMarkerToggle(int line);
 
-        struct PrintOldValues
-        {
-            int oldMarginWidth;
-            int oldMarginType;
-            int oldEdgeMode;
-        };
         // variables
         bool m_IsOK;
         wxSplitterWindow* m_pSplitter;
@@ -401,7 +386,7 @@ class DLLIMPORT cbEditor : public EditorBase
         HighlightLanguage m_lang;
         wxDateTime m_LastModified; // to check if the file was modified outside the editor
         bool m_autoIndentDone;
-        PrintOldValues m_tempPrintStorage;
+
 
         // DO NOT ADD ANY MORE VARIABLES HERE!
         // ADD THEM IN cbEditorInternalData INSTEAD!

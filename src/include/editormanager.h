@@ -137,7 +137,9 @@ class DLLIMPORT EditorManager : public Mgr<EditorManager>, public wxEvtHandler
         bool SaveActiveAs();
         bool SaveAll();
 
-        void PrintQueueEditor(cbEditorPrintout& printout, PrintColourMode pcm, bool line_numbers, cbEditor* ed, bool selection);
+        /** Add an editor to the printout queue: Clone the editor and prepare the view for a nice printout */
+        void PrintQueueEditor(cbEditorPrintout* printout, PrintColourMode pcm, bool line_numbers, cbEditor* ed);
+        /** Print the editor according the mode */
         void Print(PrintScope ps, PrintColourMode pcm, bool line_numbers);
 
         /** Hides the editor notebook for layout purposes */

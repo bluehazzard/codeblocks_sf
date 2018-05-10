@@ -22,24 +22,12 @@
 #include "printing_types.h"
 #include <wx/paper.h>
 
-cbEditorPrintout::cbEditorPrintout(const wxString& title, cbStyledTextCtrl* control, bool selectionOnly, bool destroy)
+cbEditorPrintout::cbEditorPrintout(const wxString& title, bool selectionOnly, bool destroy)
         : wxPrintout(title),
-        m_TextControl(control),
         m_selectionOnly(selectionOnly),
         m_destroyOnDestruct(destroy)
 {
     // ctor
-    m_SelStart = 0;
-    if (control != nullptr)
-    {
-        m_SelEnd = control->GetLength();
-        if (selectionOnly && !control->GetSelectedText().IsEmpty())
-        {
-            m_SelStart = control->GetSelectionStart();
-            m_SelEnd = control->GetSelectionEnd();
-        }
-        m_editors.push_back(control);
-    }
 }
 
 cbEditorPrintout::~cbEditorPrintout()
@@ -80,10 +68,6 @@ bool cbEditorPrintout::OnPrintPage(int page)
 
         PageInfo& curPage = m_pageInfo[page-1];
 
-        //Manager::Get()->GetLogManager()->DebugLog(_T("OnPrintPage: page %d , m_printed %d"), page, m_printed);
-
-        // Draws the lines from m_printed to m_SelEnd and returns the printed lanes
-        // if there is not enough space for all lanes m_printed != m_SelEnd
         curPage.editor->FormatRange (1, curPage.start, curPage.end,
                                       dc, dc, m_printRect, m_pageRect);
         return true;
@@ -166,21 +150,15 @@ void cbEditorPrintout::GetPageInfo(int *minPage, int *maxPage, int *selPageFrom,
     {
         ScaleDC(dc);
 
-        // count pages and save SelStart value of each page
-        // m_pPageSelStart[i] contains the line count for page i
-        //m_pPageSelStart->Clear();
-        //m_pPageSelStart->Add(m_SelStart);
-        //m_printed = m_SelStart;
-
         for (auto itr = m_editors.begin(); itr != m_editors.end(); ++itr)
         {
             int start = 0;
             int end = (*itr)->GetLength();
 
-            if(m_selectionOnly)
+            if(m_selectionOnly && !(*itr)->GetSelectedText().IsEmpty())
             {
-                start = m_SelStart;
-                end   = m_SelEnd;
+                start = (*itr)->GetSelectionStart();
+                end = (*itr)->GetSelectionEnd();
             }
 
             do
@@ -205,7 +183,6 @@ void cbEditorPrintout::GetPageInfo(int *minPage, int *maxPage, int *selPageFrom,
         *minPage = 1;
     *selPageFrom = *minPage;
     *selPageTo = *maxPage;
-    m_printed = m_SelStart;
 }
 
 bool cbEditorPrintout::OnBeginDocument(int startPage, int endPage)

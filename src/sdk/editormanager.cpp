@@ -817,66 +817,63 @@ bool EditorManager::SaveAll()
     return true;
 }
 
-void EditorManager::PrintQueueEditor(cbEditorPrintout& printout, PrintColourMode pcm, bool line_numbers, cbEditor* ed, bool selection)
+void EditorManager::PrintQueueEditor(cbEditorPrintout* printout, PrintColourMode pcm, bool line_numbers, cbEditor* ed)
 {
-    //for(auto itr = ed.begin(); itr != ed.end(); ++itr)
+    cbStyledTextCtrl* control = ed->CloneTextCtrl();
+    if (!control)
+        return;//continue;
+
+    // print line numbers?
+    control->Hide();
+    control->SetMarginType(C_LINE_MARGIN, wxSCI_MARGIN_NUMBER);
+    if (!line_numbers)
     {
-        cbStyledTextCtrl* control = ed->Clone();
-        if (!control)
-            return;//continue;
-
-        // print line numbers?
-        control->Hide();
-        control->SetMarginType(C_LINE_MARGIN, wxSCI_MARGIN_NUMBER);
-        if (!line_numbers)
-        {
-            control->SetPrintMagnification(-1);
-            control->SetMarginWidth(C_LINE_MARGIN, 0);
-        }
-        else
-        {
-            control->SetPrintMagnification(-2);
-            control->SetMarginWidth(C_LINE_MARGIN, 1);
-        }
-        // never print the gutter line
-        control->SetEdgeMode(wxSCI_EDGE_NONE);
-
-        switch (pcm)
-        {
-            case pcmAsIs:
-                control->SetPrintColourMode(wxSCI_PRINT_NORMAL);
-                break;
-            case pcmBlackAndWhite:
-                control->SetPrintColourMode(wxSCI_PRINT_BLACKONWHITE);
-                break;
-            case pcmColourOnWhite:
-                control->SetPrintColourMode(wxSCI_PRINT_COLOURONWHITE);
-                break;
-            case pcmInvertColours:
-                control->SetPrintColourMode(wxSCI_PRINT_INVERTLIGHT);
-                break;
-            default:
-                break;
-        }
-        printout.AddEditor(control);
+        control->SetPrintMagnification(-1);
+        control->SetMarginWidth(C_LINE_MARGIN, 0);
     }
+    else
+    {
+        control->SetPrintMagnification(-2);
+        control->SetMarginWidth(C_LINE_MARGIN, 1);
+    }
+    // never print the gutter line
+    control->SetEdgeMode(wxSCI_EDGE_NONE);
+
+    switch (pcm)
+    {
+    case pcmAsIs:
+        control->SetPrintColourMode(wxSCI_PRINT_NORMAL);
+        break;
+    case pcmBlackAndWhite:
+        control->SetPrintColourMode(wxSCI_PRINT_BLACKONWHITE);
+        break;
+    case pcmColourOnWhite:
+        control->SetPrintColourMode(wxSCI_PRINT_COLOURONWHITE);
+        break;
+    case pcmInvertColours:
+        control->SetPrintColourMode(wxSCI_PRINT_INVERTLIGHT);
+        break;
+    default:
+        break;
+    }
+    printout->AddEditor(control);
 }
 
 void EditorManager::Print(PrintScope ps, PrintColourMode pcm, bool line_numbers)
 {
     InitPrinting();
-    cbEditorPrintout printout(_("Code::Blocks"), nullptr, false);
+    cbEditorPrintout* printout = nullptr;
     switch (ps)
     {
     case psAllOpenEditors:
         {
+            printout = new cbEditorPrintout(_("Code:Blocks editor print"), false);
             for (size_t i = 0; i < m_pNotebook->GetPageCount(); ++i)
             {
                 cbEditor* ed = InternalGetBuiltinEditor(i);
                 if(ed == nullptr)
                     continue;
-
-                PrintQueueEditor(printout, pcm, line_numbers,ed,false);
+                PrintQueueEditor(printout, pcm, line_numbers, ed);
             }
 
             break;
@@ -885,14 +882,18 @@ void EditorManager::Print(PrintScope ps, PrintColourMode pcm, bool line_numbers)
     case psSelection:    // fall through
     default:
         {
+
             cbEditor* ed = GetBuiltinEditor(GetActiveEditor());
             if (ed)
-                PrintQueueEditor(printout, pcm, line_numbers, ed, ps == psSelection);
+            {
+                printout = new cbEditorPrintout(ed->GetTitle(), ps == psSelection);
+                PrintQueueEditor(printout, pcm, line_numbers, ed);
+            }
             break;
         }
     }
 
-    if (!g_printer->Print( nullptr , &printout, true))
+    if (printout == nullptr || !g_printer->Print(nullptr, printout, true))
     {
         if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
         {
@@ -907,6 +908,9 @@ void EditorManager::Print(PrintScope ps, PrintColourMode pcm, bool line_numbers)
         Manager::Get()->GetConfigManager(_T("app"))->Write(_T("/printerdialog/paperid"), (int)ppd->GetPaperId());
         Manager::Get()->GetConfigManager(_T("app"))->Write(_T("/printerdialog/paperorientation"), (int)ppd->GetOrientation());
     }
+
+    if(printout != nullptr)
+        delete printout;
 }
 
 void EditorManager::CheckForExternallyModifiedFiles()
