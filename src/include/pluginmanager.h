@@ -159,6 +159,7 @@ class DLLIMPORT PluginManager : public Mgr<PluginManager>, public wxEvtHandler
         void NotifyPlugins(CodeBlocksEvent& event);
         void NotifyPlugins(CodeBlocksDockEvent& event);
         void NotifyPlugins(CodeBlocksLayoutEvent& event);
+        void NotifyPlugins(CodeBlocksDebuggerEvent& event);
 
         static void SetSafeMode(bool on){ s_SafeMode = on; }
         static bool GetSafeMode(){ return s_SafeMode; }

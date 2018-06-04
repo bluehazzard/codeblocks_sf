@@ -71,10 +71,11 @@ public:
     static void ProcessPendingEvents();
     static void Shutdown();
 
-    bool ProcessEvent(CodeBlocksEvent&       event);
-    bool ProcessEvent(CodeBlocksDockEvent&   event);
-    bool ProcessEvent(CodeBlocksLayoutEvent& event);
-    bool ProcessEvent(CodeBlocksLogEvent&    event);
+    bool ProcessEvent(CodeBlocksEvent&          event);
+    bool ProcessEvent(CodeBlocksDockEvent&      event);
+    bool ProcessEvent(CodeBlocksLayoutEvent&    event);
+    bool ProcessEvent(CodeBlocksLogEvent&       event);
+    bool ProcessEvent(CodeBlocksDebuggerEvent&  event);
 
 
     /** Use Manager::Get() to get a pointer to its instance
@@ -155,6 +156,7 @@ public:
     void RegisterEventSink(wxEventType eventType, IEventFunctorBase<CodeBlocksDockEvent>*   functor);
     void RegisterEventSink(wxEventType eventType, IEventFunctorBase<CodeBlocksLayoutEvent>* functor);
     void RegisterEventSink(wxEventType eventType, IEventFunctorBase<CodeBlocksLogEvent>*    functor);
+    void RegisterEventSink(wxEventType eventType, IEventFunctorBase<CodeBlocksDebuggerEvent>* functor);
     void RemoveAllEventSinksFor(void* owner);
 
     /// Returns pointer to the search result logger, might be nullptr or hidden.
@@ -195,11 +197,14 @@ private:
     typedef std::map< wxEventType, LayoutEventSinksArray >           LayoutEventSinksMap;
     typedef std::vector< IEventFunctorBase<CodeBlocksLogEvent>* >    LogEventSinksArray;
     typedef std::map< wxEventType, LogEventSinksArray >              LogEventSinksMap;
+    typedef std::vector< IEventFunctorBase<CodeBlocksDebuggerEvent>* >    DebuggerEventSinksArray;
+    typedef std::map< wxEventType, DebuggerEventSinksArray >              DebuggerEventSinksMap;
 
     EventSinksMap       m_EventSinks;
     DockEventSinksMap   m_DockEventSinks;
     LayoutEventSinksMap m_LayoutEventSinks;
     LogEventSinksMap    m_LogEventSinks;
+    DebuggerEventSinksMap   m_DebuggerEventSinks;
     cbSearchResultsLog *m_SearchResultLog;
 };
 

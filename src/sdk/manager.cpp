@@ -330,6 +330,21 @@ bool Manager::ProcessEvent(CodeBlocksLogEvent& event)
     return true;
 }
 
+bool Manager::ProcessEvent(CodeBlocksDebuggerEvent& event)
+{
+    if (IsAppShuttingDown())
+        return false;
+
+    DebuggerEventSinksMap::iterator mit = m_DebuggerEventSinks.find(event.GetEventType());
+    if (mit != m_DebuggerEventSinks.end())
+    {
+        for (DebuggerEventSinksArray::iterator it = mit->second.begin(); it != mit->second.end(); ++it)
+            (*it)->Call(event);
+    }
+    return true;
+}
+
+
 bool Manager::IsAppShuttingDown()
 {
     return m_AppShuttingDown;
@@ -565,6 +580,11 @@ void Manager::RegisterEventSink(wxEventType eventType, IEventFunctorBase<CodeBlo
 void Manager::RegisterEventSink(wxEventType eventType, IEventFunctorBase<CodeBlocksLogEvent>* functor)
 {
     m_LogEventSinks[eventType].push_back(functor);
+}
+
+void Manager::RegisterEventSink(wxEventType eventType, IEventFunctorBase<CodeBlocksDebuggerEvent>* functor)
+{
+    m_DebuggerEventSinks[eventType].push_back(functor);
 }
 
 void Manager::RemoveAllEventSinksFor(void* owner)
