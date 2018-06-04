@@ -163,6 +163,29 @@ public:
     void SetSearchResultLogger(cbSearchResultsLog *log) { m_SearchResultLog = log; }
 
 private:
+
+    template<class T> void RemoveAllEventSinksFor(T& eventMap, void* owner)
+    {
+        for (typename T::iterator mit = eventMap.begin(); mit != eventMap.end(); ++mit)
+        {
+            auto it = mit->second.begin();
+            bool endIsInvalid = false;
+            while (!endIsInvalid && it != mit->second.end())
+            {
+                if ((*it) && (*it)->GetThis() == owner)
+                {
+                    auto it2 = it++;
+                    endIsInvalid = it == mit->second.end();
+                    delete (*it2);
+                    mit->second.erase(it2);
+                }
+                else
+                    ++it;
+            }
+        }
+    }
+
+
     // event sinks
     typedef std::vector< IEventFunctorBase<CodeBlocksEvent>* >       EventSinksArray;
     typedef std::map< wxEventType, EventSinksArray >                 EventSinksMap;

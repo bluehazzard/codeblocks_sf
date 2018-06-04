@@ -569,77 +569,11 @@ void Manager::RegisterEventSink(wxEventType eventType, IEventFunctorBase<CodeBlo
 
 void Manager::RemoveAllEventSinksFor(void* owner)
 {
-    for (EventSinksMap::iterator mit = m_EventSinks.begin(); mit != m_EventSinks.end(); ++mit)
-    {
-        EventSinksArray::iterator it = mit->second.begin();
-        bool endIsInvalid = false;
-        while (!endIsInvalid && it != mit->second.end())
-        {
-            if ((*it) && (*it)->GetThis() == owner)
-            {
-                EventSinksArray::iterator it2 = it++;
-                endIsInvalid = it == mit->second.end();
-                delete (*it2);
-                mit->second.erase(it2);
-            }
-            else
-                ++it;
-        }
-    }
-
-    for (DockEventSinksMap::iterator mit = m_DockEventSinks.begin(); mit != m_DockEventSinks.end(); ++mit)
-    {
-        DockEventSinksArray::iterator it = mit->second.begin();
-        bool endIsInvalid = false;
-        while (!endIsInvalid && it != mit->second.end())
-        {
-            if ((*it) && (*it)->GetThis() == owner)
-            {
-                DockEventSinksArray::iterator it2 = it++;
-                endIsInvalid = it == mit->second.end();
-                delete (*it2);
-                mit->second.erase(it2);
-            }
-            else
-                ++it;
-        }
-    }
-
-    for (LayoutEventSinksMap::iterator mit = m_LayoutEventSinks.begin(); mit != m_LayoutEventSinks.end(); ++mit)
-    {
-        LayoutEventSinksArray::iterator it = mit->second.begin();
-        bool endIsInvalid = false;
-        while (!endIsInvalid && it != mit->second.end())
-        {
-            if ((*it) && (*it)->GetThis() == owner)
-            {
-                LayoutEventSinksArray::iterator it2 = it++;
-                endIsInvalid = it == mit->second.end();
-                delete (*it2);
-                mit->second.erase(it2);
-            }
-            else
-                ++it;
-        }
-    }
-
-    for (LogEventSinksMap::iterator mit = m_LogEventSinks.begin(); mit != m_LogEventSinks.end(); ++mit)
-    {
-        LogEventSinksArray::iterator it = mit->second.begin();
-        bool endIsInvalid = false;
-        while (!endIsInvalid && it != mit->second.end())
-        {
-            if ((*it) && (*it)->GetThis() == owner)
-            {
-                LogEventSinksArray::iterator it2 = it++;
-                endIsInvalid = it == mit->second.end();
-                delete (*it2);
-                mit->second.erase(it2);
-            }
-            else
-                ++it;
-        }
-    }
+    RemoveAllEventSinksFor(m_EventSinks, owner);
+    RemoveAllEventSinksFor(m_DockEventSinks, owner);
+    RemoveAllEventSinksFor(m_LayoutEventSinks, owner);
+    RemoveAllEventSinksFor(m_LogEventSinks, owner);
+    RemoveAllEventSinksFor(m_DebuggerEventSinks, owner);
 }
 
 bool            Manager::m_AppShuttingDown = false;
