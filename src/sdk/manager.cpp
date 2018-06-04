@@ -330,6 +330,21 @@ bool Manager::ProcessEvent(CodeBlocksLogEvent& event)
     return true;
 }
 
+bool Manager::ProcessEvent(CodeBlocksDebuggerEvent& event)
+{
+    if (IsAppShuttingDown())
+        return false;
+
+    DebuggerEventSinksMap::iterator mit = m_DebuggerEventSinks.find(event.GetEventType());
+    if (mit != m_DebuggerEventSinks.end())
+    {
+        for (DebuggerEventSinksArray::iterator it = mit->second.begin(); it != mit->second.end(); ++it)
+            (*it)->Call(event);
+    }
+    return true;
+}
+
+
 bool Manager::IsAppShuttingDown()
 {
     return m_AppShuttingDown;
@@ -567,12 +582,18 @@ void Manager::RegisterEventSink(wxEventType eventType, IEventFunctorBase<CodeBlo
     m_LogEventSinks[eventType].push_back(functor);
 }
 
+void Manager::RegisterEventSink(wxEventType eventType, IEventFunctorBase<CodeBlocksDebuggerEvent>* functor)
+{
+    m_DebuggerEventSinks[eventType].push_back(functor);
+}
+
 void Manager::RemoveAllEventSinksFor(void* owner)
 {
     RemoveAllEventSinksFor(m_EventSinks, owner);
     RemoveAllEventSinksFor(m_DockEventSinks, owner);
     RemoveAllEventSinksFor(m_LayoutEventSinks, owner);
     RemoveAllEventSinksFor(m_LogEventSinks, owner);
+    RemoveAllEventSinksFor(m_DebuggerEventSinks, owner);
 
     /*for (EventSinksMap::iterator mit = m_EventSinks.begin(); mit != m_EventSinks.end(); ++mit)
     {
@@ -645,6 +666,22 @@ void Manager::RemoveAllEventSinksFor(void* owner)
                 ++it;
         }
     }
+    for (DebuggerEventSinksMap::iterator mit = m_DebuggerEventSinks.begin(); mit != m_DebuggerEventSinks.end(); ++mit)
+    {
+        DebuggerEventSinksArray::iterator it = mit->second.begin();
+        bool endIsInvalid = false;
+        while (!endIsInvalid && it != mit->second.end())
+        {
+            if ((*it) && (*it)->GetThis() == owner)
+            {
+                DebuggerEventSinksArray::iterator it2 = it++;
+                endIsInvalid = it == mit->second.end();
+                delete (*it2);
+                mit->second.erase(it2);
+            }
+            else
+                ++it;
+        }
     }*/
 }
 

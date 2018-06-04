@@ -14,6 +14,7 @@
 class cbProject;
 class EditorBase;
 class cbPlugin;
+class cbDebuggerPlugin;
 class Logger;
 
 /** A generic Code::Blocks event. */
@@ -199,6 +200,79 @@ class EVTIMPORT CodeBlocksLogEvent : public wxEvent
 };
 typedef void (wxEvtHandler::*CodeBlocksLogEventFunction)(CodeBlocksLogEvent&);
 
+
+
+/** Event used to inform other plugins about the debugger state
+  *
+  * @note
+  */
+enum cbDebuggerState
+{
+    DEBUGGER_NONE,
+    DEBUGGER_STOPPED,
+    DEBUGGER_PAUSED,
+    DEBUGGER_FINISHED,
+    DEBUGGER_STARTED,
+    DEBUGGER_CONTINUED,
+};
+
+enum cbDebuggerWindow
+{
+    DEBUGGER_WINDOW_NONE,
+    DEBUGGER_WINDOW_BACKTRACE,
+    DEBUGGER_WINDOW_CPUREGISTER,
+    DEBUGGER_WINDOW_DISASSEMBLY,
+    DEBUGGER_WINDOW_EXAMINEMEMORY,
+    DEBUGGER_WINDOW_THREADS,
+    DEBUGGER_WINDOW_WATCHES,
+    DEBUGGER_WINDOW_MEMORY,
+    DEBUGGER_WINDOW_BREAKPOINT,
+};
+
+class EVTIMPORT CodeBlocksDebuggerEvent : public wxEvent
+{
+    public:
+        CodeBlocksDebuggerEvent(wxEventType       commandType = wxEVT_NULL,
+                                cbDebuggerPlugin* plugin = nullptr,
+                                cbDebuggerState   state  = DEBUGGER_NONE,
+                                cbDebuggerWindow  window = DEBUGGER_WINDOW_NONE) :
+                                wxEvent(wxID_ANY, commandType),
+                                m_plugin(plugin),
+                                m_state(state),
+                                m_window(window)
+        {
+        };
+
+        CodeBlocksDebuggerEvent(const CodeBlocksDebuggerEvent& rhs) :
+                                    wxEvent(wxID_ANY,rhs.GetEventType()),
+                                    m_plugin(rhs.m_plugin),
+                                    m_state(rhs.m_state),
+                                    m_window(rhs.m_window)
+        {
+
+        };
+
+        virtual ~CodeBlocksDebuggerEvent()  {};
+
+		wxEvent *Clone() const override { return new CodeBlocksDebuggerEvent(*this); };
+
+		cbDebuggerPlugin* GetPlugin() const      {return m_plugin;};
+		cbDebuggerState   GetState()  const      {return m_state;};
+		cbDebuggerWindow  GetWindow() const      {return m_window;};
+
+		void SetInt(int i)      {m_int = i;};
+		int  GetInt()  const    {return m_int;};
+
+	private:
+
+        cbDebuggerPlugin*   m_plugin;
+        cbDebuggerState     m_state;
+        cbDebuggerWindow    m_window;
+        int                 m_int;
+
+		DECLARE_DYNAMIC_CLASS(CodeBlocksDebuggerEvent)
+};
+typedef void (wxEvtHandler::*CodeBlocksDebuggerEventFunction)(CodeBlocksDebuggerEvent&);
 
 // Thread event, this is basically a derived wxCommandEvent but enforce a deep copy of its
 // m_cmdString member. wxEVT_COMMAND_MENU_SELECTED is reused and event handlers are matched by
@@ -428,12 +502,11 @@ extern EVTIMPORT const wxEventType cbEVT_COMPILE_FILE_REQUEST;
 #define EVT_COMPILE_FILE_REQUEST(fn) DECLARE_EVENT_TABLE_ENTRY( cbEVT_COMPILE_FILE_REQUEST, -1, -1, (wxObjectEventFunction)(wxEventFunction)(CodeBlocksEventFunction)&fn, (wxObject *) NULL ),
 
 // debugger-related events (debugger plugins must fire them)
-extern EVTIMPORT const wxEventType cbEVT_DEBUGGER_STARTED;
-#define EVT_DEBUGGER_STARTED(fn) DECLARE_EVENT_TABLE_ENTRY( cbEVT_DEBUGGER_STARTED, -1, -1, (wxObjectEventFunction)(wxEventFunction)(CodeBlocksEventFunction)&fn, (wxObject *) NULL ),
-extern EVTIMPORT const wxEventType cbEVT_DEBUGGER_PAUSED;
-#define EVT_DEBUGGER_PAUSED(fn) DECLARE_EVENT_TABLE_ENTRY( cbEVT_DEBUGGER_PAUSED, -1, -1, (wxObjectEventFunction)(wxEventFunction)(CodeBlocksEventFunction)&fn, (wxObject *) NULL ),
-extern EVTIMPORT const wxEventType cbEVT_DEBUGGER_FINISHED;
-#define EVT_DEBUGGER_FINISHED(fn) DECLARE_EVENT_TABLE_ENTRY( cbEVT_DEBUGGER_FINISHED, -1, -1, (wxObjectEventFunction)(wxEventFunction)(CodeBlocksEventFunction)&fn, (wxObject *) NULL ),
+extern EVTIMPORT const wxEventType cbEVT_DEBUGGER_STATE_CHANGE;
+#define EVT_DEBUGGER_STATE_CHANGE(fn) DECLARE_EVENT_TABLE_ENTRY( cbEVT_DEBUGGER_STATE_CHANGE, -1, -1, (wxObjectEventFunction)(wxEventFunction)(CodeBlocksDebuggerEventFunction)&fn, (wxObject *) NULL ),
+extern EVTIMPORT const wxEventType cbEVT_DEBUGGER_UPDATE_UI;
+#define EVT_DEBUGGER_UPDATE_UI(fn) DECLARE_EVENT_TABLE_ENTRY( cbEVT_DEBUGGER_UPDATE_UI, -1, -1, (wxObjectEventFunction)(wxEventFunction)(CodeBlocksDebuggerEventFunction)&fn, (wxObject *) NULL ),
+
 
 // logger-related events
 

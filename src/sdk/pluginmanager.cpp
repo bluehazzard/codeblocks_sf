@@ -1532,6 +1532,11 @@ void PluginManager::NotifyPlugins(CodeBlocksLayoutEvent& event)
     Manager::Get()->ProcessEvent(event);
 }
 
+void PluginManager::NotifyPlugins(CodeBlocksDebuggerEvent& event)
+{
+    Manager::Get()->ProcessEvent(event);
+}
+
 bool cbHasRunningCompilers(const PluginManager *manager)
 {
     for (const cbCompilerPlugin *p : manager->GetCompilerPlugins())

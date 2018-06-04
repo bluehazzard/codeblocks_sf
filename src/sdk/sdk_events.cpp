@@ -23,6 +23,7 @@ IMPLEMENT_DYNAMIC_CLASS(CodeBlocksDockEvent, wxEvent)
 IMPLEMENT_DYNAMIC_CLASS(CodeBlocksLayoutEvent, wxEvent)
 IMPLEMENT_DYNAMIC_CLASS(CodeBlocksLogEvent, wxEvent)
 IMPLEMENT_DYNAMIC_CLASS(CodeBlocksThreadEvent, wxCommandEvent)
+IMPLEMENT_DYNAMIC_CLASS(CodeBlocksDebuggerEvent, wxEvent)
 
 
 CodeBlocksLogEvent::CodeBlocksLogEvent(wxEventType commandType, Logger* logger_in, const wxString& title_in, wxBitmap *icon_in)
@@ -154,9 +155,8 @@ const wxEventType cbEVT_COMPILER_SETTINGS_CHANGED = wxNewEventType();
 // request app to compile a single file
 const wxEventType cbEVT_COMPILE_FILE_REQUEST = wxNewEventType();
 // debugger-related events
-const wxEventType cbEVT_DEBUGGER_STARTED = wxNewEventType();
-const wxEventType cbEVT_DEBUGGER_PAUSED = wxNewEventType();
-const wxEventType cbEVT_DEBUGGER_FINISHED = wxNewEventType();
+const wxEventType cbEVT_DEBUGGER_STATE_CHANGE = wxNewEventType();
+const wxEventType cbEVT_DEBUGGER_UPDATE_UI = wxNewEventType();
 
 // logger-related events
 const wxEventType cbEVT_ADD_LOG_WINDOW = wxNewEventType();
