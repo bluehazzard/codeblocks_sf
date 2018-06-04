@@ -48,6 +48,10 @@ DbgCmd_UpdateWatchesTree::DbgCmd_UpdateWatchesTree(DebuggerDriver* driver)
 void DbgCmd_UpdateWatchesTree::Action()
 {
     Manager::Get()->GetDebuggerManager()->GetWatchesDialog()->UpdateWatches();
+
+    PluginManager *plm = Manager::Get()->GetPluginManager();
+    CodeBlocksDebuggerEvent evt(cbEVT_DEBUGGER_UPDATE_UI, this, DEBUGGER_WINDOW_WATCHES);
+    plm->NotifyPlugins(evt);
 }
 
 // Custom window to display output of DebuggerInfoCmd

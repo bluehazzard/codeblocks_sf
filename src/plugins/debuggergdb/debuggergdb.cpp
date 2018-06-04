@@ -791,7 +791,7 @@ int DebuggerGDB::DoDebug(bool breakOnEntry)
 
     // Notify debugger plugins so they could start a GDB server process
     PluginManager *plm = Manager::Get()->GetPluginManager();
-    CodeBlocksEvent evt(cbEVT_DEBUGGER_STARTED);
+    CodeBlocksDebuggerEvent evt(cbEVT_DEBUGGER_STATE_CHANGE, this, DEBUGGER_STARTED);
     plm->NotifyPlugins(evt);
     int nRet = evt.GetInt();
     if (nRet < 0)
@@ -1703,7 +1703,7 @@ void DebuggerGDB::DoBreak(bool temporary)
     #endif
         // Notify debugger plugins for end of debug session
         PluginManager *plm = Manager::Get()->GetPluginManager();
-        CodeBlocksEvent evt(cbEVT_DEBUGGER_PAUSED);
+        CodeBlocksDebuggerEvent evt(cbEVT_DEBUGGER_STATE_CHANGE, this, DEBUGGER_FINISHED);
         plm->NotifyPlugins(evt);
     }
 }
@@ -1910,7 +1910,7 @@ void DebuggerGDB::OnGDBTerminated(wxCommandEvent& event)
 
     // Notify debugger plugins for end of debug session
     PluginManager *plm = Manager::Get()->GetPluginManager();
-    CodeBlocksEvent evt(cbEVT_DEBUGGER_FINISHED);
+    CodeBlocksDebuggerEvent evt(cbEVT_DEBUGGER_STATE_CHANGE, this, DEBUGGER_FINISHED);
     plm->NotifyPlugins(evt);
 
     // switch to the user-defined layout when finished debugging
