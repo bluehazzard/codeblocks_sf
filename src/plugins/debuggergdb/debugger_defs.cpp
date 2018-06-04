@@ -19,6 +19,7 @@
 #include <cbdebugger_interfaces.h>
 #include "debugger_defs.h"
 #include "debuggerdriver.h"
+#include "pluginmanager.h"
 
 #include <wx/arrimpl.cpp>
 
@@ -48,6 +49,10 @@ DbgCmd_UpdateWatchesTree::DbgCmd_UpdateWatchesTree(DebuggerDriver* driver)
 void DbgCmd_UpdateWatchesTree::Action()
 {
     Manager::Get()->GetDebuggerManager()->GetWatchesDialog()->UpdateWatches();
+
+    PluginManager *plm = Manager::Get()->GetPluginManager();
+    CodeBlocksDebuggerEvent evt(cbEVT_DEBUGGER_UPDATE_UI, nullptr, DEBUGGER_NONE, DEBUGGER_WINDOW_WATCHES);
+    plm->NotifyPlugins(evt);
 }
 
 // Custom window to display output of DebuggerInfoCmd
