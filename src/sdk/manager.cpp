@@ -569,7 +569,12 @@ void Manager::RegisterEventSink(wxEventType eventType, IEventFunctorBase<CodeBlo
 
 void Manager::RemoveAllEventSinksFor(void* owner)
 {
-    for (EventSinksMap::iterator mit = m_EventSinks.begin(); mit != m_EventSinks.end(); ++mit)
+    RemoveAllEventSinksFor(m_EventSinks, owner);
+    RemoveAllEventSinksFor(m_DockEventSinks, owner);
+    RemoveAllEventSinksFor(m_LayoutEventSinks, owner);
+    RemoveAllEventSinksFor(m_LogEventSinks, owner);
+
+    /*for (EventSinksMap::iterator mit = m_EventSinks.begin(); mit != m_EventSinks.end(); ++mit)
     {
         EventSinksArray::iterator it = mit->second.begin();
         bool endIsInvalid = false;
@@ -640,6 +645,7 @@ void Manager::RemoveAllEventSinksFor(void* owner)
                 ++it;
         }
     }
+    }*/
 }
 
 bool            Manager::m_AppShuttingDown = false;
