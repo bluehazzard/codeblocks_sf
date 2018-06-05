@@ -239,7 +239,8 @@ class EVTIMPORT CodeBlocksDebuggerEvent : public wxEvent
                                 wxEvent(wxID_ANY, commandType),
                                 m_plugin(plugin),
                                 m_state(state),
-                                m_window(window)
+                                m_window(window),
+                                m_int(0)
         {
         };
 
@@ -247,7 +248,8 @@ class EVTIMPORT CodeBlocksDebuggerEvent : public wxEvent
                                     wxEvent(wxID_ANY,rhs.GetEventType()),
                                     m_plugin(rhs.m_plugin),
                                     m_state(rhs.m_state),
-                                    m_window(rhs.m_window)
+                                    m_window(rhs.m_window),
+                                    m_int(rhs.m_int)
         {
 
         };
