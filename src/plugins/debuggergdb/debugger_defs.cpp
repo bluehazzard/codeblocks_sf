@@ -53,7 +53,7 @@ void DbgCmd_UpdateWatchesTree::Action()
     Manager::Get()->GetDebuggerManager()->GetWatchesDialog()->UpdateWatches();
 
     PluginManager *plm = Manager::Get()->GetPluginManager();
-    CodeBlocksDebuggerEvent evt(cbEVT_DEBUGGER_UPDATE_UI, this, DEBUGGER_WINDOW_WATCHES);
+    CodeBlocksDebuggerEvent evt(cbEVT_DEBUGGER_UPDATE_UI, nullptr, DEBUGGER_NONE, DEBUGGER_WINDOW_WATCHES);
     plm->NotifyPlugins(evt);
 }
 
