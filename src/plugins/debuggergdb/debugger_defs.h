@@ -120,6 +120,15 @@ class DbgCmd_UpdateWatchesTree : public DebuggerCmd
         virtual void Action();
 };
 
+/** Action-only debugger command to signal the memory watches to update. */
+class DbgCmd_UpdateMemoryTree : public DebuggerCmd
+{
+    public:
+        DbgCmd_UpdateMemoryTree(DebuggerDriver* driver);
+        virtual ~DbgCmd_UpdateMemoryTree(){}
+        virtual void Action();
+};
+
 /** Debugger breakpoint interface.
   *
   * This is the struct used for debugger breakpoints.

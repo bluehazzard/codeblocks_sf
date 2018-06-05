@@ -683,14 +683,19 @@ void GDB_driver::UpdateWatches(cb::shared_ptr<GDBWatch> localsWatch, cb::shared_
 
 void GDB_driver::UpdateMemoryRangeWatches(MemoryRangeWatchesContainer &watches)
 {
+    bool update = false;
     for (MemoryRangeWatchesContainer::iterator it = watches.begin(); it != watches.end(); ++it)
     {
         MemoryRangeWatchesContainer::reference watch = *it;
         if (watch->IsAutoUpdateEnabled())
         {
             QueueCommand(new GdbCmd_MemoryRangeWatch(this, watch));
+            update = true;
         }
     }
+
+    if(update)
+        QueueCommand(new DbgCmd_UpdateMemoryTree(this));
 }
 
 void GDB_driver::UpdateWatch(const cb::shared_ptr<GDBWatch> &watch)

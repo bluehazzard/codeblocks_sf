@@ -19,11 +19,14 @@
 #include <cbdebugger_interfaces.h>
 #include "debugger_defs.h"
 #include "debuggerdriver.h"
+#include <pluginmanager.h>
 
 #include <wx/arrimpl.cpp>
 #include <cinttypes>
 
 #if !defined(CB_TEST_PROJECT)
+
+class PluginManager;
 
 const int DEBUGGER_CURSOR_CHANGED = wxNewId();
 const int DEBUGGER_SHOW_FILE_LINE = wxNewId();
@@ -54,6 +57,20 @@ void DbgCmd_UpdateWatchesTree::Action()
 
     PluginManager *plm = Manager::Get()->GetPluginManager();
     CodeBlocksDebuggerEvent evt(cbEVT_DEBUGGER_UPDATE_UI, nullptr, DEBUGGER_NONE, DEBUGGER_WINDOW_WATCHES);
+    plm->NotifyPlugins(evt);
+}
+
+DbgCmd_UpdateMemoryTree::DbgCmd_UpdateMemoryTree(DebuggerDriver* driver)
+    : DebuggerCmd(driver)
+{
+}
+
+void DbgCmd_UpdateMemoryTree::Action()
+{
+    Manager::Get()->GetDebuggerManager()->GetWatchesDialog()->UpdateWatches();
+
+    PluginManager *plm = Manager::Get()->GetPluginManager();
+    CodeBlocksDebuggerEvent evt(cbEVT_DEBUGGER_UPDATE_UI, nullptr, DEBUGGER_NONE, DEBUGGER_WINDOW_MEMORY);
     plm->NotifyPlugins(evt);
 }
 
