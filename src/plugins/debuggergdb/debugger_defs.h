@@ -121,11 +121,11 @@ class DbgCmd_UpdateWatchesTree : public DebuggerCmd
 };
 
 /** Action-only debugger command to signal the memory watches to update. */
-class DbgCmd_UpdateMemoryTree : public DebuggerCmd
+class GdbCmd_UpdateMemoryTree : public DebuggerCmd
 {
     public:
-        DbgCmd_UpdateMemoryTree(DebuggerDriver* driver);
-        virtual ~DbgCmd_UpdateMemoryTree(){}
+        GdbCmd_UpdateMemoryTree(DebuggerDriver* driver);
+        virtual ~GdbCmd_UpdateMemoryTree(){}
         virtual void Action();
 };
 

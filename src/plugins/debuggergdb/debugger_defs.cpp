@@ -60,12 +60,12 @@ void DbgCmd_UpdateWatchesTree::Action()
     plm->NotifyPlugins(evt);
 }
 
-DbgCmd_UpdateMemoryTree::DbgCmd_UpdateMemoryTree(DebuggerDriver* driver)
+GdbCmd_UpdateMemoryTree::GdbCmd_UpdateMemoryTree(DebuggerDriver* driver)
     : DebuggerCmd(driver)
 {
 }
 
-void DbgCmd_UpdateMemoryTree::Action()
+void GdbCmd_UpdateMemoryTree::Action()
 {
     Manager::Get()->GetDebuggerManager()->GetWatchesDialog()->UpdateWatches();
 
