@@ -4013,6 +4013,12 @@
 		<Unit filename="src/dlgabout.h">
 			<Option target="src" />
 		</Unit>
+        <Unit filename="src/dlgmanageglob.cpp">
+			<Option target="src" />
+		</Unit>
+		<Unit filename="src/dlgmanageglob.h">
+			<Option target="src" />
+		</Unit>
 		<Unit filename="src/dlgaboutplugin.cpp">
 			<Option target="src" />
 		</Unit>
@@ -4135,6 +4141,9 @@
 		<Unit filename="src/resources/dlg_about_plugin.xrc">
 			<Option target="src" />
 		</Unit>
+        <Unit filename="src/resources/dlg_manage_glob.xrc">
+            <Option target="src" />
+        </Unit>
 		<Unit filename="src/resources/edit_keywords.xrc">
 			<Option target="src" />
 		</Unit>
