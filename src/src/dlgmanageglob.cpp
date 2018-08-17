@@ -100,7 +100,7 @@ void dlgManageGlob::OnPopulateList()
         m_grid->SetCellRenderer(i, 1, new wxGridCellBoolRenderer);
         m_grid->SetCellEditor(i, 1, new wxGridCellBoolEditor);
         m_grid->SetCellAlignment(i, 1, wxALIGN_CENTRE , wxALIGN_CENTRE  );
-        m_grid->SetCellValue(i, 1, m_GlobList[i].m_Recursive ? _("1") : wxString() );
+        m_grid->SetCellValue(i, 1, m_GlobList[i].m_Recursive ?  wxString(_("1")) : wxString() );
 
         m_grid->SetCellValue(i, 2, m_GlobList[i].m_WildCard);
     }
