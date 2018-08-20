@@ -46,7 +46,7 @@
 #include "projectfileoptionsdlg.h"
 #include "projectoptionsdlg.h"
 #include "projectsfilemasksdlg.h"
-#include "dlgmanageglob.h"
+#include "dlgmanageglobs.h"
 
 #include "goto_file.h"
 #include "startherepage.h"
@@ -1356,7 +1356,7 @@ void ProjectManagerUI::OnAddFilesToProjectRecursively(wxCommandEvent& event)
 
 void ProjectManagerUI::OnManageGlobs(wxCommandEvent& event)
 {
-    dlgManageGlob globManager(nullptr);
+    dlgManageGlobs globManager(nullptr);
     globManager.ShowModal();
 }
 

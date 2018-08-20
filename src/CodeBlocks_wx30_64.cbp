@@ -4026,12 +4026,18 @@
 		<Unit filename="src/dlgaboutplugin.h">
 			<Option target="src" />
 		</Unit>
-        <Unit filename="src/dlgmanageglob.cpp">
-            <Option target="src" />
-        </Unit>
-        <Unit filename="src/dlgmanageglob.h">
-            <Option target="src" />
-        </Unit>
+		<Unit filename="src/dlgeditprojectglob.cpp">
+			<Option target="src" />
+		</Unit>
+		<Unit filename="src/dlgeditprojectglob.h">
+			<Option target="src" />
+		</Unit>
+		<Unit filename="src/dlgmanageglobs.cpp">
+			<Option target="src" />
+		</Unit>
+		<Unit filename="src/dlgmanageglobs.h">
+			<Option target="src" />
+		</Unit>
 		<Unit filename="src/editkeywordsdlg.cpp">
 			<Option target="src" />
 		</Unit>
@@ -4148,9 +4154,6 @@
 		<Unit filename="src/resources/dlg_about_plugin.xrc">
 			<Option target="src" />
 		</Unit>
-        <Unit filename="src/resources/dlg_manage_glob.xrc">
-            <Option target="src" />
-        </Unit>
 		<Unit filename="src/resources/edit_keywords.xrc">
 			<Option target="src" />
 		</Unit>
@@ -4296,6 +4299,12 @@
 		<Unit filename="wxsmith/debuggersettingspanel.wxs">
 			<Option target="src" />
 		</Unit>
+		<Unit filename="wxsmith/dlgeditprojectglob.wxs">
+			<Option target="src" />
+		</Unit>
+		<Unit filename="wxsmith/dlgmanageglobs.wxs">
+			<Option target="src" />
+		</Unit>
 		<Unit filename="wxsmith/goto_file.wxs">
 			<Option target="src" />
 		</Unit>
@@ -4322,6 +4331,8 @@
 					<wxPanel wxs="wxsmith/debuggersettingscommonpanel.wxs" src="src/debuggersettingscommonpanel.cpp" hdr="src/debuggersettingscommonpanel.h" fwddecl="0" i18n="1" name="DebuggerSettingsCommonPanel" language="CPP" />
 					<wxDialog wxs="wxsmith/goto_file.wxs" src="src/goto_file.cpp" hdr="src/goto_file.h" fwddecl="1" i18n="1" name="GotoFile" language="CPP" />
 					<wxDialog wxs="plugins/codecompletion/wxsmith/goto_function.wxs" src="plugins/codecompletion/gotofunctiondlg.cpp" hdr="plugins/codecompletion/gotofunctiondlg.h" fwddecl="1" i18n="1" name="GotoFunctionDlg" language="CPP" />
+					<wxDialog wxs="wxsmith/dlgmanageglobs.wxs" src="src/dlgmanageglobs.cpp" hdr="src/dlgmanageglobs.h" fwddecl="0" i18n="1" name="dlgManageGlobs" language="CPP" />
+					<wxDialog wxs="wxsmith/dlgeditprojectglob.wxs" src="src/dlgeditprojectglob.cpp" hdr="src/dlgeditprojectglob.h" fwddecl="0" i18n="1" name="dlgEditProjectGlob" language="CPP" />
 				</resources>
 			</wxsmith>
 			<debugger />
