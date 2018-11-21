@@ -39,8 +39,8 @@ SquirrelError::SquirrelError()
 void SquirrelVM::Init(SquirrelInitFlags flags)
 {
 	_VM = sq_open(1024);
-	sq_setprintfunc(_VM,SquirrelVM::PrintFunc);
-//	sq_setprintfunc(_VM,SquirrelVM::PrintFunc,SquirrelVM::PrintFunc);
+//	sq_setprintfunc(_VM,SquirrelVM::PrintFunc);
+	sq_setprintfunc(_VM,SquirrelVM::PrintFunc,SquirrelVM::PrintFunc);
 	sq_pushroottable(_VM);
     // C::B patch: Add additional initialisation flags
 	if (flags & sqifIO) sqstd_register_iolib(_VM);
@@ -88,7 +88,7 @@ void SquirrelVM::PrintFunc(HSQUIRRELVM /*v*/,const SQChar* s,...)
 	static SQChar temp[2048];
 	va_list vl;
 	va_start(vl, s);
-	scvsprintf( temp,s, vl);
+	scvsprintf( temp, sizeof(temp), s, vl);
 	SCPUTS(temp);
 	va_end(vl);
 }
