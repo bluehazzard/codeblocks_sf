@@ -330,7 +330,7 @@ function GetFuseBytes()
 
 // -----------------------------------------------------------------------------
 // each time, return a string of the form "filename.ext;contents"
-// you can change the return string based on <file_index>
+// you can change the return string _based on <file_index>
 // return an empty string to denote that no more files are to be generated
 function GetGeneratedFile(file_index)
 {
@@ -417,31 +417,31 @@ function SetupProject(project)
 
 
     // Post build commands
-    pb_eephex = _T("avr-objcopy --no-change-warnings -j .eeprom --change-section-lma .eeprom=0 -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).eep");
-    pb_fusehex = _T("avr-objcopy --no-change-warnings -j .fuse --change-section-lma .fuse=0 -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).fuse");
-    pb_lockhex = _T("avr-objcopy --no-change-warnings -j .lock --change-section-lma .lock=0 -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).lock");
-    pb_sighex = _T("avr-objcopy --no-change-warnings -j .signature --change-section-lma .signature=0 -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).sig");
-    pb_hex = _T("avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).hex");
-    pb_lfshex = _T("srec_cat $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).fuse -Intel -crop 0x00 0x01 -offset  0x00 -O $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).lfs -Intel ");
-    pb_hfshex = _T("srec_cat $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).fuse -Intel -crop 0x01 0x02 -offset -0x01 -O $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).hfs -Intel ");
-    pb_efshex = _T("srec_cat $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).fuse -Intel -crop 0x02 0x03 -offset -0x02 -O $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).efs -Intel ");
+    pb_eephex = _T("avr-objcopy --no-change-warnings -j .eeprom --change-section-lma .eeprom=0 -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).eep");
+    pb_fusehex = _T("avr-objcopy --no-change-warnings -j .fuse --change-section-lma .fuse=0 -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).fuse");
+    pb_lockhex = _T("avr-objcopy --no-change-warnings -j .lock --change-section-lma .lock=0 -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).lock");
+    pb_sighex = _T("avr-objcopy --no-change-warnings -j .signature --change-section-lma .signature=0 -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).sig");
+    pb_hex = _T("avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).hex");
+    pb_lfshex = _T("srec_cat $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).fuse -Intel -crop 0x00 0x01 -offset  0x00 -O $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).lfs -Intel ");
+    pb_hfshex = _T("srec_cat $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).fuse -Intel -crop 0x01 0x02 -offset -0x01 -O $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).hfs -Intel ");
+    pb_efshex = _T("srec_cat $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).fuse -Intel -crop 0x02 0x03 -offset -0x02 -O $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).efs -Intel ");
 
-    pb_eepbin = _T("avr-objcopy --no-change-warnings -j .eeprom --change-section-lma .eeprom=0 -O binary $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).eep");
-    pb_fusebin = _T("avr-objcopy --no-change-warnings -j .fuse --change-section-lma .fuse=0 -O binary $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).fuse");
-    pb_lockbin = _T("avr-objcopy --no-change-warnings -j .lock --change-section-lma .lock=0 -O binary $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).lock");
-    pb_sigbin = _T("avr-objcopy --no-change-warnings -j .signature --change-section-lma .signature=0 -O binary $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).sig");
-    pb_bin = _T("avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O binary $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).bin");
+    pb_eepbin = _T("avr-objcopy --no-change-warnings -j .eeprom --change-section-lma .eeprom=0 -O binary $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).eep");
+    pb_fusebin = _T("avr-objcopy --no-change-warnings -j .fuse --change-section-lma .fuse=0 -O binary $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).fuse");
+    pb_lockbin = _T("avr-objcopy --no-change-warnings -j .lock --change-section-lma .lock=0 -O binary $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).lock");
+    pb_sigbin = _T("avr-objcopy --no-change-warnings -j .signature --change-section-lma .signature=0 -O binary $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).sig");
+    pb_bin = _T("avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O binary $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).bin");
 
-    pb_eepsrec = _T("avr-objcopy --no-change-warnings -j .eeprom --change-section-lma .eeprom=0 -O srec $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).eep");
-    pb_fusesrec = _T("avr-objcopy --no-change-warnings -j .fuse --change-section-lma .fuse=0 -O srec $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).fuse");
-    pb_locksrec = _T("avr-objcopy --no-change-warnings -j .lock --change-section-lma .lock=0 -O srec $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).lock");
-    pb_sigsrec = _T("avr-objcopy --no-change-warnings -j .signature --change-section-lma .signature=0 -O srec $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).sig");
-    pb_srec = _T("avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O srec $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).srec");
+    pb_eepsrec = _T("avr-objcopy --no-change-warnings -j .eeprom --change-section-lma .eeprom=0 -O srec $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).eep");
+    pb_fusesrec = _T("avr-objcopy --no-change-warnings -j .fuse --change-section-lma .fuse=0 -O srec $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).fuse");
+    pb_locksrec = _T("avr-objcopy --no-change-warnings -j .lock --change-section-lma .lock=0 -O srec $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).lock");
+    pb_sigsrec = _T("avr-objcopy --no-change-warnings -j .signature --change-section-lma .signature=0 -O srec $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).sig");
+    pb_srec = _T("avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O srec $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).srec");
 
     if ( PLATFORM == PLATFORM_MSW )
-        pb_lss = _T("cmd /c \"avr-objdump -h -S $(TARGET_OUTPUT_FILE) > $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).lss\"");
+        pb_lss = _T("cmd /c \"avr-objdump -h -S $(TARGET_OUTPUT_FILE) > $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).lss\"");
     else
-        pb_lss = _T("avr-objdump -h -S $(TARGET_OUTPUT_FILE) > $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).lss");
+        pb_lss = _T("avr-objdump -h -S $(TARGET_OUTPUT_FILE) > $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).lss");
 
     // avr-size is compiled with patches under winavr to produce a fancy output
     // which displays the percentage of memory used by the application for the
@@ -453,7 +453,7 @@ function SetupProject(project)
         pb_avrsize = _T("avr-size $(TARGET_OUTPUT_FILE)");
 
     // Setup the linker options
-    lo_map = _T("-Wl,-Map=$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).map,--cref");
+    lo_map = _T("-Wl,-Map=$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).map,--cref");
 
     // Get external memory start address
     lo_extmem = _T("-Wl,--section-start=.data=") + AvrExtMemAddr;

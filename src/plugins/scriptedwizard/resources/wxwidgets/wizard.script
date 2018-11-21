@@ -373,8 +373,8 @@ function OnLeave_WxConf(fwd)
         }
         else /* Check for wxcore*/
         {
-            lib_deb_name = LibPrefix + _T("wxbase") + LibWxVer + LibUnicSuffix + _T("d") + LibSuffix;
-            lib_rel_name = LibPrefix + _T("wxbase") + LibWxVer + LibUnicSuffix + LibSuffix;
+            lib_deb_name = LibPrefix + _T("wx_base") + LibWxVer + LibUnicSuffix + _T("d") + LibSuffix;
+            lib_rel_name = LibPrefix + _T("wx_base") + LibWxVer + LibUnicSuffix + LibSuffix;
         }
         /* Check whether the libraries exist or not */
         if (WizType == wizProject)
@@ -546,7 +546,7 @@ function OnClick_m_radioBoxWxChoice()
 
 // -----------------------------------------------------------------------------
 // each time, return a string of the form "filename.ext;contents"
-// you can change the return string based on <file_index>
+// you can change the return string _based on <file_index>
 // return an empty string to denote that no more files are to be generated
 function GetGeneratedFile(file_index)
 {
@@ -1055,18 +1055,18 @@ function SetupTarget(target, is_debug)
             if (LibWxOdbc)
             {
                 target.AddLinkLib(LibPrefix + _T("wxmsw") + LibWxVer + LibUnicSuffix + LibDebugSuffix + _T("_dbgrid") + LibSuffix);
-                target.AddLinkLib(LibPrefix + _T("wxbase") + LibWxVer + LibUnicSuffix + LibDebugSuffix + _T("_odbc") + LibSuffix);
+                target.AddLinkLib(LibPrefix + _T("wx_base") + LibWxVer + LibUnicSuffix + LibDebugSuffix + _T("_odbc") + LibSuffix);
             }
             if (LibWxMedia) target.AddLinkLib(LibPrefix + _T("wxmsw") + LibWxVer + LibUnicSuffix + LibDebugSuffix + _T("_media") + LibSuffix);
-            if (LibWxNet) target.AddLinkLib(LibPrefix + _T("wxbase") + LibWxVer + LibUnicSuffix + LibDebugSuffix + _T("_net") + LibSuffix);
+            if (LibWxNet) target.AddLinkLib(LibPrefix + _T("wx_base") + LibWxVer + LibUnicSuffix + LibDebugSuffix + _T("_net") + LibSuffix);
             if (LibWxOpengl) target.AddLinkLib(LibPrefix + _T("wxmsw") + LibWxVer + LibUnicSuffix + LibDebugSuffix + _T("_gl") + LibSuffix);
             if (LibWxQa) target.AddLinkLib(LibPrefix + _T("wxmsw") + LibWxVer + LibUnicSuffix + LibDebugSuffix + _T("_qa") + LibSuffix);
             // Now comes the core libraries
-            if (LibWxXml) target.AddLinkLib(LibPrefix + _T("wxbase") + LibWxVer + LibUnicSuffix + LibDebugSuffix + _T("_xml") + LibSuffix);
+            if (LibWxXml) target.AddLinkLib(LibPrefix + _T("wx_base") + LibWxVer + LibUnicSuffix + LibDebugSuffix + _T("_xml") + LibSuffix);
             if (LibWxAdv) target.AddLinkLib(LibPrefix + _T("wxmsw") + LibWxVer + LibUnicSuffix + LibDebugSuffix + _T("_adv") + LibSuffix);
             if (LibWxHtml) target.AddLinkLib(LibPrefix + _T("wxmsw") + LibWxVer + LibUnicSuffix + LibDebugSuffix + _T("_html") + LibSuffix);
             target.AddLinkLib(LibPrefix + _T("wxmsw") + LibWxVer + LibUnicSuffix + LibDebugSuffix + _T("_core") + LibSuffix);
-            target.AddLinkLib(LibPrefix + _T("wxbase") + LibWxVer + LibUnicSuffix + LibDebugSuffix + LibSuffix);
+            target.AddLinkLib(LibPrefix + _T("wx_base") + LibWxVer + LibUnicSuffix + LibDebugSuffix + LibSuffix);
             target.AddLinkLib(LibPrefix + _T("wxpng") + LibDebugSuffix + LibSuffix);
             if (LibWxJpeg) target.AddLinkLib(LibPrefix + _T("wxjpeg") + LibDebugSuffix + LibSuffix);
             if (LibWxTiff) target.AddLinkLib(LibPrefix + _T("wxtiff") + LibDebugSuffix + LibSuffix);
@@ -1364,7 +1364,7 @@ function BoolToInt(val)
 
 function SetupAddlLibs()
 {
-    // Now set these variable values based on library selections
+    // Now set these variable values _based on library selections
     if (!AddlLibList.IsEmpty())
     {
         local tempLibArray = ::wxArrayString();

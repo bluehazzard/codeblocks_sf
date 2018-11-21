@@ -34,8 +34,8 @@ function BeginWizard()
                         "This means that you must have exactly this setup to be able to\n" +
                         "build the generated plugin.\n" +
                         "You must also have defined two global variables:\n" +
-                        "   1. $(#cb) pointing to Code::Blocks base dir (where CodeBlocks.cbp is)\n" +
-                        "   2. $(#wx) pointing to wxWidgets base directory\n\n\n");
+                        "   1. $(#cb) pointing to Code::Blocks _base dir (where CodeBlocks.cbp is)\n" +
+                        "   2. $(#wx) pointing to wxWidgets _base directory\n\n\n");
     }
     intro_msg += _T("When you 're ready to proceed, please click \"Next\"...");
 
@@ -62,7 +62,7 @@ function OnEnter_PluginOptions(fwd)
 }
 
 // -----------------------------------------------------------------------------
-// enable/disable available options based on selected plugin type
+// enable/disable available options _based on selected plugin type
 function OnClick_cmbPluginType()
 {
     PluginSettings.Type = Wizard.GetComboboxSelection(_T("cmbPluginType"));
@@ -175,7 +175,7 @@ function OnLeave_wxVersionPage(fwd)
 
 // -----------------------------------------------------------------------------
 // each time, return a string of the form "filename.ext;contents"
-// you can change the return string based on <file_index>
+// you can change the return string _based on <file_index>
 // return an empty string to denote that no more files are to be generated
 function GetGeneratedFile(file_index)
 {
@@ -191,8 +191,8 @@ function GetGeneratedFile(file_index)
     return _T(""); // no more generated files
 }
 
-// Return the path to the devel folder based on the wx version we are targeting
-function GetBaseDevelPath(version)
+// Return the path to the devel folder _based on the wx version we are targeting
+function Get_baseDevelPath(version)
 {
     if (PLATFORM == PLATFORM_MSW)
     {
@@ -313,7 +313,7 @@ function SetupTarget(target, isSystemWide, targetWxVersion)
 
     if (PLATFORM == PLATFORM_MSW)
     {
-        target.SetHostApplication(GetBaseDevelPath(targetWxVersion) + _T("\\codeblocks") + DOT_EXT_EXECUTABLE);
+        target.SetHostApplication(Get_baseDevelPath(targetWxVersion) + _T("\\codeblocks") + DOT_EXT_EXECUTABLE);
 
         if (targetWxVersion == 0)
         {
@@ -340,7 +340,7 @@ function SetupTarget(target, isSystemWide, targetWxVersion)
             target.AddLibDir(_T("$(#wx31.lib)\\gcc_dll"));
         }
 
-        target.AddLibDir(GetBaseDevelPath(targetWxVersion));
+        target.AddLibDir(Get_baseDevelPath(targetWxVersion));
         target.AddLinkLib(_T("codeblocks"));
     }
     else
@@ -352,7 +352,7 @@ function SetupTarget(target, isSystemWide, targetWxVersion)
         }
         else
         {
-            local develPath = GetBaseDevelPath(targetWxVersion);
+            local develPath = Get_baseDevelPath(targetWxVersion);
             target.SetHostApplication(develPath + _T("/codeblocks") + DOT_EXT_EXECUTABLE);
             target.AddLibDir(develPath);
             target.SetWorkingDir(develPath);
@@ -382,10 +382,10 @@ function SetupTarget(target, isSystemWide, targetWxVersion)
     else
     {
         // "to_codeblocks" has to copy multiple files to the $(#cb)\devel folder. This is a platform specific process
-        local basePath = GetBaseDevelPath(targetWxVersion) + _T("/share/codeblocks/");
-        zipFilePath = basePath + PluginSettings.Name + _T(".zip");
+        local _basePath = Get_baseDevelPath(targetWxVersion) + _T("/share/codeblocks/");
+        zipFilePath = _basePath + PluginSettings.Name + _T(".zip");
 
-        target.SetOutputFilename(basePath + _T("plugins/") + PluginSettings.Name);
+        target.SetOutputFilename(_basePath + _T("plugins/") + PluginSettings.Name);
 
         local executionParameters = _T("--debug-log --multiple-instance --no-splash-screen --verbose -p debug");
         if (PLATFORM == PLATFORM_MSW)

@@ -334,7 +334,7 @@ function SetupTarget(target,is_debug)
     }
     if (!Board.Lower().Matches(_T("triboard")))
     {
-        local inifile = _T("$(JIOBASE)") + wxFILE_SEP_PATH + Board + _T("-") + Processor.Lower() + _T(".ini");
+        local inifile = _T("$(JIO_base)") + wxFILE_SEP_PATH + Board + _T("-") + Processor.Lower() + _T(".ini");
         target.SetVar(_T("JTAGINIT"), inifile, false);
     }
     target.SetVar(_T("STRCONFIGFILE"), Board.Upper() + _T("_") + Processor.Upper() + _T("_") + target.GetTitle() + _T(".cfg"), false);

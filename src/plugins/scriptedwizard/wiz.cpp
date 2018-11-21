@@ -53,7 +53,7 @@ namespace
 }
 
 // scripting support
-DECLARE_INSTANCE_TYPE(Wiz);
+DECLARE_INSTANCE_PRIVATE_CONSTR_TYPE(Wiz);
 
 Wiz::Wiz()
     : m_pWizard(nullptr),
@@ -421,7 +421,7 @@ CompileTargetBase* Wiz::RunProjectWizard(wxString* pFilename)
     wxString srcdir;
     try
     {
-        SqPlus::SquirrelFunction<wxString&> f("GetFilesDir");
+        SqPlus::SquirrelFunction<wxString> f("GetFilesDir");
         if (!f.func.IsNull())
             srcdir = f();
         if (!srcdir.IsEmpty())
@@ -443,7 +443,7 @@ CompileTargetBase* Wiz::RunProjectWizard(wxString* pFilename)
     // add generated files
     try
     {
-        SqPlus::SquirrelFunction<wxString&> f("GetGeneratedFile");
+        SqPlus::SquirrelFunction<wxString> f("GetGeneratedFile");
         if (!f.func.IsNull())
         {
             wxArrayString files;
@@ -562,7 +562,7 @@ CompileTargetBase* Wiz::RunTargetWizard(cb_unused wxString* pFilename)
         // the name of the new target that should be added.
         try
         {
-            SqPlus::SquirrelFunction<wxString&> f("GetTargetName");
+            SqPlus::SquirrelFunction<wxString> f("GetTargetName");
             targetName = f();
             if (targetName == wxEmptyString)
             {
@@ -634,7 +634,7 @@ CompileTargetBase* Wiz::RunTargetWizard(cb_unused wxString* pFilename)
 //    wxString srcdir;
 //    try
 //    {
-//        SqPlus::SquirrelFunction<wxString&> f("GetFilesDir");
+//        SqPlus::SquirrelFunction<wxString> f("GetFilesDir");
 //        srcdir = f();
 //        if (!srcdir.IsEmpty())
 //        {
@@ -678,7 +678,7 @@ CompileTargetBase* Wiz::RunFilesWizard(wxString* pFilename)
 {
     try
     {
-        SqPlus::SquirrelFunction<wxString&> f("CreateFiles");
+        SqPlus::SquirrelFunction<wxString> f("CreateFiles");
         wxString files = f();
         if (files.IsEmpty())
             cbMessageBox(_("Wizard failed..."), _("Error"), wxICON_ERROR);

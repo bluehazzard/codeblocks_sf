@@ -183,7 +183,7 @@ function SetupProject(project)
     }
     else // PLATFORM != PLATFORM_MSW
     {
-        // opencv-config based: things are ultra-simple :)
+        // opencv-config _based: things are ultra-simple :)
         project.AddCompilerOption(_T("`opencv-config --cxxflags`"));
         project.AddLinkerOption(_T("`opencv-config --ldstaticflags`"));
     }

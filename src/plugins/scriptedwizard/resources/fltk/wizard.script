@@ -26,7 +26,7 @@ function BeginWizard()
 
     // "select fltk project to generate" text
     local fltkprjtype_descr = _T("Please select the type of project to generate.");
-    local fltkprj_choices = _T("Simple main() example;FLUID-based project");
+    local fltkprj_choices = _T("Simple main() example;FLUID-_based project");
 
     Wizard.AddInfoPage(_T("FltkIntro"), intro_msg);
     Wizard.AddProjectPathPage();
@@ -132,7 +132,7 @@ function SetupProject(project)
     }
     else // PLATFORM != PLATFORM_MSW
     {
-        // fltk-config based: things are ultra-simple :)
+        // fltk-config _based: things are ultra-simple :)
         project.AddCompilerOption(_T("`fltk-config --cxxflags`"));
         project.AddLinkerOption(_T("`fltk-config --ldstaticflags`"));
     }

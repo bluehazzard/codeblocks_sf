@@ -60,7 +60,7 @@ function CreateFiles() {
 	else { // succeeded -> add file to project if needed
 		if( ed_new.GetText().IsEmpty() ) {
 			local shortname = ed_new.GetShortName();
-			local basename = shortname.BeforeFirst( '.' );
+			local _basename = shortname.BeforeFirst( '.' );
 
 			local default_text = _T( "// $Id: $\n"
 			+ "/**\n"
@@ -80,11 +80,11 @@ function CreateFiles() {
 			+ "You should have received a copy of the GNU General Public License along with\n"
 			+ "this program. If not, see <http://www.gnu.org/licenses/>.\n"
 			+ "*/\n"
-			+ "module @BASENAME@;\n"
+			+ "module @_baseNAME@;\n"
 			+ "\n");
 
 			default_text.Replace( _T("@SHORTNAME@"), shortname );
-			default_text.Replace( _T("@BASENAME@"), basename );
+			default_text.Replace( _T("@_baseNAME@"), _basename );
 			ed_new.SetText( default_text );
 		}
 

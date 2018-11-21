@@ -118,7 +118,7 @@ wxWizardPage* WizPageBase::GetPrev() const
     try
     {
         wxString sig = _T("OnGetPrevPage_") + m_PageName;
-        SqPlus::SquirrelFunction<wxString&> cb(cbU2C(sig));
+        SqPlus::SquirrelFunction<wxString> cb(cbU2C(sig));
         if (cb.func.IsNull())
             return wxWizardPageSimple::GetPrev();
         wxString prev = cb();
@@ -140,7 +140,7 @@ wxWizardPage* WizPageBase::GetNext() const
     try
     {
         wxString sig = _T("OnGetNextPage_") + m_PageName;
-        SqPlus::SquirrelFunction<wxString&> cb(cbU2C(sig));
+        SqPlus::SquirrelFunction<wxString> cb(cbU2C(sig));
         if (cb.func.IsNull())
             return wxWizardPageSimple::GetNext();
         wxString next = cb();

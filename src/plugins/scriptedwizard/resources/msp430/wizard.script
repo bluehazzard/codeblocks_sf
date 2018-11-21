@@ -213,7 +213,7 @@ function SetupProject(project)
 				case 3: // <item>Olimex MSP-JTAG-ISO</item>
 					programmerDriver = "olimex";
 					break;olimex
-				case 4: // <item>TI generic flash-based bootloader via RS-232</item>
+				case 4: // <item>TI generic flash-_based bootloader via RS-232</item>
 					programmerDriver = "flash-bsl";
 					break;					
 			}

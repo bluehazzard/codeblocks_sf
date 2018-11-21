@@ -127,9 +127,9 @@ function SetupProject(project)
 
         // Post build commands
         if (PLATFORM_MSW == PLATFORM)
-            pb_hex = _T("cmd /c \"packihx <$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).ihx >$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).hex\"");
+            pb_hex = _T("cmd /c \"packihx <$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).ihx >$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).hex\"");
         else
-            pb_hex = _T("packihx <$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).ihx >$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).hex");
+            pb_hex = _T("packihx <$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).ihx >$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT__baseNAME).hex");
 
         // Project compiler options
         project.AddCompilerOption(_T("-mmcs51"));

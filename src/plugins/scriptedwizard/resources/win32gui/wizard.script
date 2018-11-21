@@ -24,7 +24,7 @@ function BeginWizard()
     Wizard.AddInfoPage(_T("Win32Intro"), intro_msg);
     Wizard.AddGenericSingleChoiceListPage(_T("Win32ProjType"),
             _T("Please select type of project."),
-            _T("Frame based;Dialog based"),
+            _T("Frame _based;Dialog _based"),
             ProjectType); // select wxwidgets version
     Wizard.AddProjectPathPage();
     Wizard.AddCompilerPage(_T(""), _T("*"), true, true);

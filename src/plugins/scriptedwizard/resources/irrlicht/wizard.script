@@ -113,7 +113,7 @@ function SetupProject(project)
 {
     // set project options
 
-    // calculate the final lib directory, based on current platform and compiler
+    // calculate the final lib directory, _based on current platform and compiler
     local IrrlichtLibDir;
     if (PLATFORM == PLATFORM_MSW)
     {

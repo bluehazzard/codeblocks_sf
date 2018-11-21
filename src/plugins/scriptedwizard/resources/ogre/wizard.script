@@ -145,7 +145,7 @@ function SetupProject(project)
 
         // help the linker
         project.AddLinkerOption(_T("-Wl,--enable-runtime-pseudo-reloc"));
-        project.AddLinkerOption(_T("-Wl,--enable-auto-image-base"));
+        project.AddLinkerOption(_T("-Wl,--enable-auto-image-_base"));
         project.AddLinkerOption(_T("-Wl,--add-stdcall-alias"));
         project.AddLinkerOption(_T("-mthreads"));
     }
@@ -163,7 +163,7 @@ function SetupProject(project)
     {
         project.AddIncludeDir(OgrePath + _T("/OgreMain/include"));
         project.AddIncludeDir(OgrePath + _T("/Samples/Common/include"));
-        // lib dirs are different based on Debug/Release targets
+        // lib dirs are different _based on Debug/Release targets
     }
 
     // enable compiler warnings (project-wide)
