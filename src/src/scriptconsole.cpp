@@ -49,7 +49,7 @@ static void ScriptConsolePrintFunc(HSQUIRRELVM /*v*/, const SQChar * s, ...)
     static SQChar temp[2048];
     va_list vl;
     va_start(vl,s);
-    scvsprintf( temp,s,vl);
+    scvsprintf( temp, sizeof(temp) ,s,vl);
     wxString msg = cbC2U(temp);
     va_end(vl);
 
@@ -114,7 +114,7 @@ ScriptConsole::ScriptConsole(wxWindow* parent,wxWindowID id)
     {
         s_Console = this;
         s_OldPrintFunc = sq_getprintfunc(SquirrelVM::GetVMPtr());
-        sq_setprintfunc(SquirrelVM::GetVMPtr(), ScriptConsolePrintFunc);
+        sq_setprintfunc(SquirrelVM::GetVMPtr(), ScriptConsolePrintFunc, ScriptConsolePrintFunc);
     }
 
     Log(_("Welcome to the script console!"));
@@ -126,7 +126,7 @@ ScriptConsole::~ScriptConsole()
     {
         s_Console = nullptr;
         if (SquirrelVM::GetVMPtr())
-            sq_setprintfunc(SquirrelVM::GetVMPtr(), s_OldPrintFunc);
+            sq_setprintfunc(SquirrelVM::GetVMPtr(), s_OldPrintFunc, s_OldPrintFunc);
     }
 
     //(*Destroy(ScriptConsole)

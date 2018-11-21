@@ -22,6 +22,23 @@ namespace ScriptBindings
     ///////////////////
     // wxArrayString //
     ///////////////////
+    SQInteger wxArrayString_dtor(SQUserPointer up, cb_unused SQInteger size)
+    {
+        SQ_DELETE_CLASS(wxArrayString);
+    }
+
+    SQInteger wxArrayString_ctor(HSQUIRRELVM v)
+    {
+        StackHandler sa(v);
+        SQInteger parCount = sa.GetParamCount();
+        if(parCount == 1)
+        {
+            wxArrayString* ptr = new wxArrayString();
+            return SqPlus::PostConstruct(v, ptr, wxArrayString_dtor);
+        }
+        return sa.ThrowError("wxArrayString constructor invalid parameter!");
+    }
+
     void wxArrayString_Clear(HSQUIRRELVM v)
     {
         static_assert(wxMinimumVersion<2,8,12>::eval, "wxWidgets 2.8.12 is required");
@@ -35,6 +52,22 @@ namespace ScriptBindings
         StackHandler sa(v);
         wxArrayString& self = *SqPlus::GetInstance<wxArrayString,false>(v, 1);
         return sa.Return((SQInteger)self.GetCount());
+    }
+
+    SQInteger wxArrayString_Add(HSQUIRRELVM v)
+    {
+        static_assert(wxMinimumVersion<2,8,12>::eval, "wxWidgets 2.8.12 is required");
+        StackHandler sa(v);
+        if(sa.GetParamCount() < 2)
+            sa.ThrowError("wxArrayString add invalid parameter count!");
+
+        wxArrayString& self = *SqPlus::GetInstance<wxArrayString,false>(v, 1);
+        wxString inpstr = *SqPlus::GetInstance<wxString,false>(v, 2);
+        int copies = 1;
+        if(sa.GetParamCount() == 3)
+            copies = sa.GetInt(3);
+
+        return sa.Return((SQInteger)self.Add(inpstr, copies));
     }
 
     SQInteger wxArrayString_Index(HSQUIRRELVM v)
@@ -125,6 +158,44 @@ namespace ScriptBindings
     wxString static_T(const SQChar* str)
     {
         return cbC2U(str);
+    }
+
+    SQInteger wxString_dtor(SQUserPointer up, cb_unused SQInteger size)
+    {
+        SQ_DELETE_CLASS(wxString);
+    }
+
+
+    SQInteger wxString_ctor(HSQUIRRELVM v)
+    {
+        StackHandler sa(v);
+        SQInteger parCount = sa.GetParamCount();
+        if(parCount == 1)
+        {
+            wxString* ptr = new wxString();
+            return SqPlus::PostConstruct(v, ptr, wxString_dtor);
+        }
+        else if(parCount == 2)
+        {
+            SQInteger type = sa.GetType(2);
+            if(type == OT_STRING)
+            {
+                // String constructor
+                const char* inp = sa.GetString(2);
+                wxString* ptr = new wxString(wxString::FromUTF8(inp));
+                return SqPlus::PostConstruct(v, ptr, wxString_dtor);
+            }
+            else if(type == OT_INSTANCE)
+            {
+                wxString *str2 = SqPlus::GetInstance<wxString,false>(v, 2);
+                if (!str2)
+                    return sa.ThrowError("Second paramter is not a wxString instance!");
+                wxString* ptr = new wxString(*str2);
+                return SqPlus::PostConstruct(v, ptr, wxString_dtor);
+            }
+
+        }
+        return sa.ThrowError("wxString constructor invalid parameter!");
     }
 
     // wxString operator+
@@ -288,8 +359,9 @@ namespace ScriptBindings
         // wxArrayString //
         ///////////////////
         SqPlus::SQClassDef<wxArrayString>("wxArrayString").
-                emptyCtor().
-                func(&wxArrayString::Add, "Add").
+                staticFuncVarArgs(&wxArrayString_ctor, "constructor", "*").
+                //func(&wxArrayString::Add, "Add").
+                staticFuncVarArgs(&wxArrayString_Add, "Add").
                 staticFunc(&wxArrayString_Clear, "Clear").
                 staticFuncVarArgs(&wxArrayString_Index, "Index", "*").
                 func<wxArrayStrinGetCount>(&wxArrayString::GetCount, "GetCount").
@@ -400,7 +472,7 @@ namespace ScriptBindings
         typedef wxString&(wxString::*WXSTR_REMOVE_2)(size_t pos, size_t len);
 
         SqPlus::SQClassDef<wxString>("wxString").
-                emptyCtor().
+                staticFuncVarArgs(&wxString_ctor, "constructor", "*").
                 staticFuncVarArgs(&wxString_OpAdd, "_add", "*").
                 staticFuncVarArgs(&wxString_OpCmp, "_cmp", "*").
                 staticFuncVarArgs(&wxString_OpToString, "_tostring", "").

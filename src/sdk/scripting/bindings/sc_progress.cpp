@@ -45,7 +45,7 @@ class ProgressDialog : public wxProgressDialog
         }
 };
 
-DECLARE_INSTANCE_TYPE(ProgressDialog);
+DECLARE_INSTANCE_PRIVATE_CONSTR_TYPE(ProgressDialog);
 
 namespace ScriptBindings
 {

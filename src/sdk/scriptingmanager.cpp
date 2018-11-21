@@ -97,7 +97,7 @@ ScriptingManager::ScriptingManager()
     if (!SquirrelVM::GetVMPtr())
         cbThrow(_T("Can't create scripting engine!"));
 
-    sq_setprintfunc(SquirrelVM::GetVMPtr(), ScriptsPrintFunc);
+    sq_setprintfunc(SquirrelVM::GetVMPtr(), ScriptsPrintFunc, ScriptsPrintFunc);
     sqstd_register_stringlib(SquirrelVM::GetVMPtr());
 
     RefreshTrusts();
@@ -222,9 +222,9 @@ wxString ScriptingManager::LoadBufferRedirectOutput(const wxString& buffer)
     s_ScriptErrors.Clear();
     ::capture.Clear();
 
-    sq_setprintfunc(SquirrelVM::GetVMPtr(), CaptureScriptOutput);
+    sq_setprintfunc(SquirrelVM::GetVMPtr(), CaptureScriptOutput, CaptureScriptOutput);
     bool res = LoadBuffer(buffer);
-    sq_setprintfunc(SquirrelVM::GetVMPtr(), ScriptsPrintFunc);
+    sq_setprintfunc(SquirrelVM::GetVMPtr(), ScriptsPrintFunc, ScriptsPrintFunc);
 
     return res ? ::capture : (wxString) wxEmptyString;
 }

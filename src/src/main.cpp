@@ -847,7 +847,7 @@ void MainFrame::SetupDebuggerUI()
     }
 }
 
-DECLARE_INSTANCE_TYPE(MainFrame);
+DECLARE_INSTANCE_PRIVATE_CONSTR_TYPE(MainFrame);
 
 void MainFrame::RegisterScriptFunctions()
 {

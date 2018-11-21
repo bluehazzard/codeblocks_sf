@@ -55,7 +55,7 @@ wxArrayInt CreateMenu(const wxString& name)
     }
     MenuItemsManager& mi = itm->second;
 
-    SqPlus::SquirrelFunction<wxArrayString&> f(o, "GetMenu");
+    SqPlus::SquirrelFunction<wxArrayString> f(o, "GetMenu");
     if (f.func.IsNull())
         return ret;
 
@@ -75,7 +75,7 @@ wxArrayInt CreateMenu(const wxString& name)
         for (size_t i = 0; i < arr.GetCount(); ++i)
         {
             int id = wxNewId();
-            id = mi.CreateFromString(arr[i], id);
+            id = mi.CreateFromString(arr.Item(i), id);
 
             ret.Add(id);
 
@@ -93,7 +93,6 @@ wxArrayInt CreateMenu(const wxString& name)
             }
         }
     }
-
     return ret;
 }
 
@@ -109,7 +108,7 @@ wxArrayInt CreateModuleMenu(const ModuleType typ, wxMenu* menu, const FileTreeDa
     for (it = s_ScriptPlugins.begin(); it != s_ScriptPlugins.end(); ++it)
     {
         SquirrelObject& o = it->second;
-        SqPlus::SquirrelFunction<wxArrayString&> f(o, "GetModuleMenu");
+        SqPlus::SquirrelFunction<wxArrayString> f(o, "GetModuleMenu");
         if (f.func.IsNull())
             continue;
 
@@ -350,7 +349,7 @@ void Register_ScriptPlugin()
     // we also have to disable the printfunc for a while
 
     SQPRINTFUNCTION oldPrintFunc = sq_getprintfunc(SquirrelVM::GetVMPtr());
-    sq_setprintfunc(SquirrelVM::GetVMPtr(), 0);
+    sq_setprintfunc(SquirrelVM::GetVMPtr(), 0, 0);
 
     // compile and run script
     SquirrelObject script;
@@ -367,7 +366,7 @@ void Register_ScriptPlugin()
     }
 
     // restore the printfunc
-    sq_setprintfunc(SquirrelVM::GetVMPtr(), oldPrintFunc);
+    sq_setprintfunc(SquirrelVM::GetVMPtr(), oldPrintFunc, oldPrintFunc);
 }
 
 }; // namespace ScriptBindings
