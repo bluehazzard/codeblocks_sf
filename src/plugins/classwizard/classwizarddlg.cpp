@@ -163,6 +163,10 @@ void ClassWizardDlg::OnAddMemberVar(cb_unused wxCommandEvent& event)
     bool     noprfx = XRCCTRL(*this, "chkRemovePrefix", wxCheckBox)->GetValue();
     wxString prefix = XRCCTRL(*this, "txtPrefix",       wxTextCtrl)->GetValue();
 
+    ConfigManager *cfg = Manager::Get()->GetConfigManager(_T("classwizard"));
+    int      firstLetter = cfg->ReadInt(_T("/SetGet/FirstLetter"),     0);
+    int      nameGeneration = cfg->ReadInt(_T("/SetGet/NameGeneration"),     0);
+
     // Valid strings are f.ex.: unsigned int foo, wxString bar, ...
     wxString memtyp = member.BeforeLast(_T(' ')).Trim();
     wxString memvar = member.AfterLast(_T(' ')).Trim();
@@ -197,12 +201,50 @@ void ClassWizardDlg::OnAddMemberVar(cb_unused wxCommandEvent& event)
                         memvar.Right(memvar.Length()-prefix.Length()) :
                         memvar );
 
+    switch (nameGeneration)
+    {
+    case 0: // Normal, codeblocks default behaviour
+        // do nothing
+        break;
+    case 1: // camel case , the first letter of the Variable is big
+        {
+            wxString first = method.Mid(0,1);
+            wxString other = method.Mid(1);
+            method = first.Upper() + other;
+        }
+        break;
+    case 2: // all upper case
+        method.MakeUpper();
+        break;
+    case 3: // All lower case
+        method.MakeLower();
+        break;
+    }
+
     MemberVar mv;
     mv.Typ = memtyp;
     mv.Var = memvar;
     mv.Scp = memscp;
-    if (getter) mv.Get = _T("Get") + method; else mv.Get = wxEmptyString;
-    if (setter) mv.Set = _T("Set") + method; else mv.Set = wxEmptyString;
+    mv.Get = wxEmptyString;
+    mv.Set = wxEmptyString;
+    if (getter)
+    {
+        if (firstLetter == 0)
+            mv.Get << _T("Get");
+        else if (firstLetter == 1)
+            mv.Get << _T("get");
+
+        mv.Get << method;
+    }
+    if (setter)
+    {
+        if (firstLetter == 0)
+            mv.Set << _T("Set");
+        else if (firstLetter == 1)
+            mv.Set << _T("set");
+
+         mv.Set << method;
+    }
     m_MemberVars.push_back(mv);
 
     XRCCTRL(*this, "lstMemberVars", wxListBox)->Append(DoMemVarRepr(memtyp, memvar, memscp));
@@ -505,6 +547,9 @@ bool ClassWizardDlg::DoHeader()
     }
     buffer << m_EolStr;
 
+
+    ConfigManager *cfg = Manager::Get()->GetConfigManager(_T("classwizard"));
+    int implementation = cfg->ReadInt(_T("/SetGet/Implementation"), 0);
     bool addnewline = false;
     std::vector<MemberVar>::iterator it = m_MemberVars.begin();
     while( it != m_MemberVars.end() )
@@ -522,7 +567,14 @@ bool ClassWizardDlg::DoHeader()
                        << _T(" */") << m_EolStr;
             }
             buffer << m_TabStr << m_TabStr << (*it).Typ << _T(" ") << (*it).Get
-                   << _T("() { return ") << (*it).Var << _T("; }") << m_EolStr;
+                   << _T("()");
+            if (implementation == 0) // implementation of get/set function is in the header file
+            {
+                buffer << _T("{ return ") << (*it).Var << _T("; }") << m_EolStr;
+            }
+            else // implementation of get/set function is in the source file
+                buffer << _T(";") << m_EolStr;
+
         }
         if (!(*it).Set.IsEmpty())
         {
@@ -537,7 +589,14 @@ bool ClassWizardDlg::DoHeader()
                        << _T(" */") << m_EolStr;
             }
             buffer << m_TabStr << m_TabStr << _T("void ") << (*it).Set << _T("(")
-                   << (*it).Typ << _T(" val) { ") << (*it).Var << _T(" = val; }") << m_EolStr;
+                   << (*it).Typ << _T(" val)");
+
+            if (implementation == 0) // implementation of get/set function is in the header file
+            {
+                buffer << m_TabStr <<  _T("{ ") << (*it).Var << _T(" = val; }") << m_EolStr;
+            }
+            else // implementation of get/set function is in the source file
+                buffer << _T(";") << m_EolStr;
         }
         ++it;
     }
@@ -698,6 +757,35 @@ bool ClassWizardDlg::DoImpl()
         buffer << m_TabStr << _T("return *this;") << m_EolStr;
         buffer << _T("}") << m_EolStr;
     }
+
+
+    ConfigManager *cfg = Manager::Get()->GetConfigManager(_T("classwizard"));
+    int implementation = cfg->ReadInt(_T("/SetGet/Implementation"), 0);
+    std::vector<MemberVar>::iterator it = m_MemberVars.begin();
+
+    // if we have members and the implementation should be in the source file
+    while (implementation == 1 && it != m_MemberVars.end() )
+    {
+        if (!(*it).Get.IsEmpty())
+        {
+            buffer << (*it).Typ << _T(" ") << m_Name << _T("::") << (*it).Get << _T("()") << m_EolStr
+                   << _T("{") << m_EolStr
+                   << m_TabStr << _T("return ") << (*it).Var << _T(";") << m_EolStr
+                   <<  _T("}") << m_EolStr
+                   << m_EolStr;
+        }
+        if (!(*it).Set.IsEmpty())
+        {
+            buffer << _T("void ") << m_Name << _T("::") << (*it).Set <<  _T("(") << (*it).Typ << _T(" val)") << m_EolStr
+                   << _T("{") << m_EolStr
+                   << m_TabStr << (*it).Var << _T(" = val;") << m_EolStr
+                   <<  _T("}") << m_EolStr
+                   << m_EolStr;
+
+        }
+        ++it;
+    }
+
 
     if (m_NameSpaces.GetCount())
     {
