@@ -30,7 +30,7 @@ class ClassWizardDlg : public wxScrollingDialog
         wxString GetIncludeDir();
 
     private:
-        struct MemberVar_impl { wxString Typ; wxString Var; wxString Get; wxString Set; int Scp; };
+        struct MemberVar_impl { wxString Typ; wxString VarNoPrefix; wxString Var; wxString Get; wxString Set; int Scp; };
         typedef struct MemberVar_impl MemberVar;
         typedef std::vector<MemberVar> MemberVarsArray;
 

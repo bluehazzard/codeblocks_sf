@@ -224,6 +224,9 @@ void ClassWizardDlg::OnAddMemberVar(cb_unused wxCommandEvent& event)
     MemberVar mv;
     mv.Typ = memtyp;
     mv.Var = memvar;
+    mv.VarNoPrefix = ( (memvar.StartsWith(prefix)) ?
+                        memvar.Right(memvar.Length()-prefix.Length()) :
+                        memvar );
     mv.Scp = memscp;
     mv.Get = wxEmptyString;
     mv.Set = wxEmptyString;
@@ -550,6 +553,7 @@ bool ClassWizardDlg::DoHeader()
 
     ConfigManager *cfg = Manager::Get()->GetConfigManager(_T("classwizard"));
     int implementation = cfg->ReadInt(_T("/SetGet/Implementation"), 0);
+    int parameterStyle = cfg->ReadInt(_T("/SetGet/ParameterStyle"), 0);
     bool addnewline = false;
     std::vector<MemberVar>::iterator it = m_MemberVars.begin();
     while( it != m_MemberVars.end() )
@@ -578,22 +582,26 @@ bool ClassWizardDlg::DoHeader()
         }
         if (!(*it).Set.IsEmpty())
         {
+            wxString parameterName = _T("val");
             addnewline = true;
+            if (parameterStyle == 1)    // We use the variable name as parameter name
+                parameterName = (*it).VarNoPrefix;
+
             if (m_Documentation)
             {
                 buffer << m_TabStr << m_TabStr
                        << _T("/** Set ") << (*it).Var << m_EolStr;
                 buffer << m_TabStr << m_TabStr
-                       << _T(" * \\param val New value to set") << m_EolStr;
+                       << _T(" * \\param ") << parameterName << _T(" New value to set") << m_EolStr;
                 buffer << m_TabStr << m_TabStr
                        << _T(" */") << m_EolStr;
             }
             buffer << m_TabStr << m_TabStr << _T("void ") << (*it).Set << _T("(")
-                   << (*it).Typ << _T(" val)");
+                   << (*it).Typ << _T(" ") << parameterName << _T(")");
 
             if (implementation == 0) // implementation of get/set function is in the header file
             {
-                buffer << m_TabStr <<  _T("{ ") << (*it).Var << _T(" = val; }") << m_EolStr;
+                buffer << m_TabStr <<  _T("{ ") << (*it).Var << _T(" = ") << parameterName << _T("; }") << m_EolStr;
             }
             else // implementation of get/set function is in the source file
                 buffer << _T(";") << m_EolStr;
@@ -761,6 +769,7 @@ bool ClassWizardDlg::DoImpl()
 
     ConfigManager *cfg = Manager::Get()->GetConfigManager(_T("classwizard"));
     int implementation = cfg->ReadInt(_T("/SetGet/Implementation"), 0);
+    int parameterStyle = cfg->ReadInt(_T("/SetGet/ParameterStyle"), 0);
     std::vector<MemberVar>::iterator it = m_MemberVars.begin();
 
     // if we have members and the implementation should be in the source file
@@ -776,9 +785,13 @@ bool ClassWizardDlg::DoImpl()
         }
         if (!(*it).Set.IsEmpty())
         {
-            buffer << _T("void ") << m_Name << _T("::") << (*it).Set <<  _T("(") << (*it).Typ << _T(" val)") << m_EolStr
+            wxString parameterName = _T("val");
+            if (parameterStyle == 1)    // We use the variable name as parameter name
+                parameterName = (*it).VarNoPrefix;
+
+            buffer << _T("void ") << m_Name << _T("::") << (*it).Set <<  _T("(") << (*it).Typ << _T(" ") << parameterName << _T(")") << m_EolStr
                    << _T("{") << m_EolStr
-                   << m_TabStr << (*it).Var << _T(" = val;") << m_EolStr
+                   << m_TabStr << (*it).Var << _T(" = ") << parameterName << _T(";") << m_EolStr
                    <<  _T("}") << m_EolStr
                    << m_EolStr;
 
