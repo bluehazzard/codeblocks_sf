@@ -12,5 +12,5 @@ libclasswizard_la_LDFLAGS = @MODULE_SHARED_LDFLAGS@ -version-info 0:1:0 -no-unde
 
 libclasswizard_la_LIBADD = ../../sdk/libcodeblocks.la $(WX_LIBS)
 
-libclasswizard_la_SOURCES = classwizard.cpp classwizarddlg.cpp
-noinst_HEADERS = classwizard.h classwizarddlg.h
+libclasswizard_la_SOURCES = classwizard.cpp classwizarddlg.cpp classwizardconfigdlg.cpp
+noinst_HEADERS = classwizard.h classwizarddlg.h classwizardconfigdlg.h

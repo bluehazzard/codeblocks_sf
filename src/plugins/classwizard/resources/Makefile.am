@@ -1,4 +1,4 @@
-EXTRA_DIST = manifest.xml new_class.xrc
+EXTRA_DIST = manifest.xml new_class.xrc configuration.xrc
 
 pkgdata_DATA = classwizard.zip
 CLEANFILES = $(pkgdata_DATA)

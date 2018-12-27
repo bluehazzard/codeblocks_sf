@@ -1405,10 +1405,19 @@
 		<Unit filename="plugins/classwizard/classwizard.h">
 			<Option target="Class wizard" />
 		</Unit>
+		<Unit filename="plugins/classwizard/classwizardconfigdlg.cpp">
+			<Option target="Class wizard" />
+		</Unit>
+		<Unit filename="plugins/classwizard/classwizardconfigdlg.h">
+			<Option target="Class wizard" />
+		</Unit>
 		<Unit filename="plugins/classwizard/classwizarddlg.cpp">
 			<Option target="Class wizard" />
 		</Unit>
 		<Unit filename="plugins/classwizard/classwizarddlg.h">
+			<Option target="Class wizard" />
+		</Unit>
+		<Unit filename="plugins/classwizard/resources/configuration.xrc">
 			<Option target="Class wizard" />
 		</Unit>
 		<Unit filename="plugins/classwizard/resources/manifest.xml">
