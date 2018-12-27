@@ -25,6 +25,7 @@
 #include <wx/filesys.h>
 #include "classwizard.h"
 #include "classwizarddlg.h"
+#include "classwizardconfigdlg.h"
 
 // this auto-registers the plugin
 namespace
@@ -143,4 +144,12 @@ void ClassWizard::OnLaunch(cb_unused wxCommandEvent& event)
             prjMan->GetUI().RebuildTree();
         }
     }
+}
+
+cbConfigurationPanel* ClassWizard::GetConfigurationPanel(wxWindow* parent)
+{
+    ClassWizardConfigDlg* dlg = new ClassWizardConfigDlg(parent);
+    // deleted by the caller
+
+    return dlg;
 }

@@ -17,6 +17,9 @@ class ClassWizard : public cbPlugin
         virtual void OnAttach();
         virtual void OnRelease(bool appShutDown);
 
+        int GetConfigurationGroup() const { return cgEditor; }
+        cbConfigurationPanel* GetConfigurationPanel(wxWindow* parent);
+
         virtual void BuildMenu(wxMenuBar* menuBar);
 
 		void OnLaunch(wxCommandEvent& event);

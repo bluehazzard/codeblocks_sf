@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+	<object class="wxPanel" name="dlgClassWizardConfig">
+		<object class="wxBoxSizer">
+			<orient>wxVERTICAL</orient>
+			<object class="sizeritem">
+				<object class="wxNotebook" name="nbMain">
+					<object class="notebookpage">
+						<object class="wxPanel" name="tabStyle">
+							<object class="wxBoxSizer">
+								<orient>wxVERTICAL</orient>
+								<object class="sizeritem">
+									<object class="wxStaticBoxSizer">
+										<label>get/set function style</label>
+										<orient>wxVERTICAL</orient>
+										<object class="sizeritem">
+											<object class="wxBoxSizer">
+												<object class="sizeritem">
+													<object class="wxRadioBox" name="rbParameterStyle">
+														<label>paramater style</label>
+														<content>
+															<item>generic name</item>
+															<item>variable name</item>
+														</content>
+														<default>-1</default>
+													</object>
+													<flag>wxALL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxRadioBox" name="rbFirstLetter">
+														<label>first letter</label>
+														<content>
+															<item>upper case</item>
+															<item>lower case</item>
+														</content>
+														<default>-1</default>
+													</object>
+													<flag>wxTOP|wxLEFT|wxRIGHT</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxRadioBox" name="rbImplementation">
+														<label>implementation</label>
+														<content>
+															<item>header</item>
+															<item>source</item>
+														</content>
+														<default>-1</default>
+													</object>
+													<flag>wxTOP|wxLEFT|wxRIGHT</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+											</object>
+											<flag>wxTOP|wxLEFT|wxRIGHT|wxALIGN_LEFT</flag>
+											<border>5</border>
+										</object>
+										<object class="sizeritem">
+											<object class="wxBoxSizer">
+												<object class="sizeritem">
+													<object class="wxRadioBox" name="rbNameGeneration">
+														<label>function name generation</label>
+														<content>
+															<item>normal</item>
+															<item>camel case</item>
+															<item>all upper case</item>
+															<item>all lower case</item>
+														</content>
+														<default>-1</default>
+													</object>
+													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+											</object>
+											<flag>wxALL|wxALIGN_LEFT</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxEXPAND</flag>
+									<border>5</border>
+								</object>
+							</object>
+						</object>
+						<label>Style</label>
+					</object>
+					<object class="notebookpage">
+						<object class="wxPanel" name="ID_PANEL1" />
+						<label>Files</label>
+					</object>
+				</object>
+				<flag>wxLEFT|wxEXPAND</flag>
+				<border>5</border>
+				<option>1</option>
+			</object>
+		</object>
+	</object>
+</resource>
