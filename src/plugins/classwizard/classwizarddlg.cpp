@@ -197,9 +197,25 @@ void ClassWizardDlg::OnAddMemberVar(cb_unused wxCommandEvent& event)
         it++;
     }
 
-    wxString method = ( (noprfx && memvar.StartsWith(prefix)) ?
-                        memvar.Right(memvar.Length()-prefix.Length()) :
-                        memvar );
+    wxString method = memvar;
+    MemberVar mv;
+
+    if (memvar.IsEmpty() == false &&
+        memvar.StartsWith(prefix) )
+    {
+        // remove prefix from variable for function parameter
+        mv.VarNoPrefix = memvar.Right(memvar.Length()-prefix.Length());
+        // should the prefix also be removed for the function name?
+        if(noprfx)
+            method = mv.VarNoPrefix;
+    }
+
+    mv.Typ = memtyp;
+    mv.Var = memvar;
+
+    mv.Scp = memscp;
+    mv.Get = wxEmptyString;
+    mv.Set = wxEmptyString;
 
     switch (nameGeneration)
     {
@@ -221,15 +237,6 @@ void ClassWizardDlg::OnAddMemberVar(cb_unused wxCommandEvent& event)
         break;
     }
 
-    MemberVar mv;
-    mv.Typ = memtyp;
-    mv.Var = memvar;
-    mv.VarNoPrefix = ( (memvar.StartsWith(prefix)) ?
-                        memvar.Right(memvar.Length()-prefix.Length()) :
-                        memvar );
-    mv.Scp = memscp;
-    mv.Get = wxEmptyString;
-    mv.Set = wxEmptyString;
     if (getter)
     {
         if (firstLetter == 0)
