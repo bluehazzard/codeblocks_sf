@@ -14,15 +14,15 @@ class ClassWizard : public cbPlugin
         ClassWizard();
         ~ClassWizard();
 
-        virtual void OnAttach();
-        virtual void OnRelease(bool appShutDown);
+        virtual void OnAttach() override;
+        virtual void OnRelease(bool appShutDown) override;
 
-        int GetConfigurationGroup() const { return cgEditor; }
-        cbConfigurationPanel* GetConfigurationPanel(wxWindow* parent);
+        int GetConfigurationGroup() const override { return cgEditor; }
+        cbConfigurationPanel* GetConfigurationPanel(wxWindow* parent) override;
 
-        virtual void BuildMenu(wxMenuBar* menuBar);
+        virtual void BuildMenu(wxMenuBar* menuBar) override;
 
-		void OnLaunch(wxCommandEvent& event);
+        void OnLaunch(wxCommandEvent& event);
 
 	protected:
 		wxMenu* m_FileNewMenu;

@@ -25,40 +25,40 @@ END_EVENT_TABLE()
 
 ClassWizardConfigDlg::ClassWizardConfigDlg(wxWindow* parent)
 {
-  //ctor
-  wxXmlResource::Get()->LoadPanel(this, parent, _T("dlgClassWizardConfig"));
-  LoadSettings();
+    //ctor
+    wxXmlResource::Get()->LoadPanel(this, parent, _T("dlgClassWizardConfig"));
+    LoadSettings();
 }
 
 ClassWizardConfigDlg::~ClassWizardConfigDlg()
 {
-  //dtor
+    //dtor
 }
 
 
 void ClassWizardConfigDlg::LoadSettings()
 {
-  ConfigManager* cfg = Manager::Get()->GetConfigManager(_T("classwizard"));
+    ConfigManager* cfg = Manager::Get()->GetConfigManager(_T("classwizard"));
 
-  XRCCTRL(*this,   "rbParameterStyle",       wxRadioBox)->SetSelection(cfg->ReadInt(_T("/SetGet/ParameterStyle"),  0));
-  XRCCTRL(*this,   "rbFirstLetter",          wxRadioBox)->SetSelection(cfg->ReadInt(_T("/SetGet/FirstLetter"),     0));
-  XRCCTRL(*this,   "rbImplementation",       wxRadioBox)->SetSelection(cfg->ReadInt(_T("/SetGet/Implementation"),  0));
-  XRCCTRL(*this,   "rbNameGeneration",       wxRadioBox)->SetSelection(cfg->ReadInt(_T("/SetGet/NameGeneration"),  0));
+    XRCCTRL(*this,   "rbParameterStyle",       wxRadioBox)->SetSelection(cfg->ReadInt(_T("/SetGet/ParameterStyle"),  0));
+    XRCCTRL(*this,   "rbFirstLetter",          wxRadioBox)->SetSelection(cfg->ReadInt(_T("/SetGet/FirstLetter"),     0));
+    XRCCTRL(*this,   "rbImplementation",       wxRadioBox)->SetSelection(cfg->ReadInt(_T("/SetGet/Implementation"),  0));
+    XRCCTRL(*this,   "rbNameGeneration",       wxRadioBox)->SetSelection(cfg->ReadInt(_T("/SetGet/NameGeneration"),  0));
 
-  XRCCTRL(*this,   "txtExtHeader",       wxTextCtrl)->SetValue(cfg->Read(_T("/header_type"),  _T("h")));
-  XRCCTRL(*this,   "txtExtSource",       wxTextCtrl)->SetValue(cfg->Read(_T("/source_type"),  _T("cpp")));
+    XRCCTRL(*this,   "txtExtHeader",       wxTextCtrl)->SetValue(cfg->Read(_T("/header_type"),  _T("h")));
+    XRCCTRL(*this,   "txtExtSource",       wxTextCtrl)->SetValue(cfg->Read(_T("/source_type"),  _T("cpp")));
 }
 
 void ClassWizardConfigDlg::SaveSettings()
 {
   ConfigManager* cfg = Manager::Get()->GetConfigManager(_T("classwizard"));
 
-  cfg->Write(_T("/SetGet/ParameterStyle"),    XRCCTRL(*this, "rbParameterStyle",    wxRadioBox)->GetSelection());
-  cfg->Write(_T("/SetGet/FirstLetter"),       XRCCTRL(*this, "rbFirstLetter",       wxRadioBox)->GetSelection());
-  cfg->Write(_T("/SetGet/Implementation"),    XRCCTRL(*this, "rbImplementation",    wxRadioBox)->GetSelection());
-  cfg->Write(_T("/SetGet/NameGeneration"),    XRCCTRL(*this, "rbNameGeneration",    wxRadioBox)->GetSelection());
+    cfg->Write(_T("/SetGet/ParameterStyle"),    XRCCTRL(*this, "rbParameterStyle",    wxRadioBox)->GetSelection());
+    cfg->Write(_T("/SetGet/FirstLetter"),       XRCCTRL(*this, "rbFirstLetter",       wxRadioBox)->GetSelection());
+    cfg->Write(_T("/SetGet/Implementation"),    XRCCTRL(*this, "rbImplementation",    wxRadioBox)->GetSelection());
+    cfg->Write(_T("/SetGet/NameGeneration"),    XRCCTRL(*this, "rbNameGeneration",    wxRadioBox)->GetSelection());
 
-  cfg->Write(_T("/header_type"),    XRCCTRL(*this, "txtExtHeader",    wxTextCtrl)->GetValue());
-  cfg->Write(_T("/source_type"),    XRCCTRL(*this, "txtExtSource",    wxTextCtrl)->GetValue());
+    cfg->Write(_T("/header_type"),    XRCCTRL(*this, "txtExtHeader",    wxTextCtrl)->GetValue());
+    cfg->Write(_T("/source_type"),    XRCCTRL(*this, "txtExtSource",    wxTextCtrl)->GetValue());
 
 }

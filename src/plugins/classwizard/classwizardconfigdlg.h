@@ -11,21 +11,21 @@
 
 class ClassWizardConfigDlg : public cbConfigurationPanel
 {
-	public:
-		ClassWizardConfigDlg(wxWindow* parent);
-		virtual ~ClassWizardConfigDlg();
+    public:
+        ClassWizardConfigDlg(wxWindow* parent);
+        virtual ~ClassWizardConfigDlg();
 
-	protected:
+    protected:
 
-        virtual wxString GetTitle() const { return _("Class wizard"); }
-        virtual wxString GetBitmapBaseName() const { return _T("classwizard-plugin"); }
-        virtual void OnApply(){ SaveSettings(); }
-        virtual void OnCancel(){}
+        virtual wxString GetTitle() const override { return _("Class wizard"); }
+        virtual wxString GetBitmapBaseName() const override { return _T("classwizard-plugin"); }
+        virtual void OnApply() override { SaveSettings(); }
+        virtual void OnCancel() override {}
 
         void LoadSettings();
         void SaveSettings();
 
-	private:
+    private:
         DECLARE_EVENT_TABLE()
 };
 
