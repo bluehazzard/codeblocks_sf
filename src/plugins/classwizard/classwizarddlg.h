@@ -34,6 +34,34 @@ class ClassWizardDlg : public wxScrollingDialog
         typedef struct MemberVar_impl MemberVar;
         typedef std::vector<MemberVar> MemberVarsArray;
 
+
+        enum class eParameterName
+        {
+            genericName,
+            variableName,
+        };
+
+        enum class eFirstLetter
+        {
+            upperCase,
+            lowerCase
+        };
+
+        enum class eImplementation
+        {
+            header,
+            source
+        };
+
+        enum class eFunctionNameGeneration
+        {
+            normal,
+            camelCase,
+            allUpperCase,
+            allLowerCase
+        };
+
+
         // events
         void OnUpdateUI(wxUpdateUIEvent& event);
         void OnNameChange(wxCommandEvent& event);
@@ -95,6 +123,9 @@ class ClassWizardDlg : public wxScrollingDialog
 
         wxString        m_TabStr;
         wxString        m_EolStr;
+
+        eImplementation m_getSetImplementation;
+        eParameterName  m_parameterName;
 
         DECLARE_EVENT_TABLE()
 };

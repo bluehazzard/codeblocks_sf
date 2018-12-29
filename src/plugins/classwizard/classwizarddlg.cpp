@@ -164,8 +164,8 @@ void ClassWizardDlg::OnAddMemberVar(cb_unused wxCommandEvent& event)
     wxString prefix = XRCCTRL(*this, "txtPrefix",       wxTextCtrl)->GetValue();
 
     ConfigManager *cfg = Manager::Get()->GetConfigManager(_T("classwizard"));
-    int      firstLetter = cfg->ReadInt(_T("/SetGet/FirstLetter"),     0);
-    int      nameGeneration = cfg->ReadInt(_T("/SetGet/NameGeneration"),     0);
+    const eFirstLetter firstLetter = static_cast<eFirstLetter>(cfg->ReadInt(_T("/SetGet/FirstLetter"), 0));
+    const eFunctionNameGeneration nameGeneration = static_cast<eFunctionNameGeneration>(cfg->ReadInt(_T("/SetGet/NameGeneration"), 0));
 
     // Valid strings are f.ex.: unsigned int foo, wxString bar, ...
     wxString memtyp = member.BeforeLast(_T(' ')).Trim();
@@ -219,41 +219,45 @@ void ClassWizardDlg::OnAddMemberVar(cb_unused wxCommandEvent& event)
 
     switch (nameGeneration)
     {
-    case 0: // Normal, codeblocks default behaviour
+    case eFunctionNameGeneration::normal :
         // do nothing
         break;
-    case 1: // camel case , the first letter of the Variable is big
+    case eFunctionNameGeneration::camelCase :
         {
             wxString first = method.Mid(0,1);
             wxString other = method.Mid(1);
             method = first.Upper() + other;
         }
         break;
-    case 2: // all upper case
+    case eFunctionNameGeneration::allUpperCase :
         method.MakeUpper();
         break;
-    case 3: // All lower case
+    case eFunctionNameGeneration::allLowerCase :
         method.MakeLower();
         break;
     }
 
     if (getter)
     {
-        if (firstLetter == 0)
-            mv.Get << _T("Get");
-        else if (firstLetter == 1)
-            mv.Get << _T("get");
-
+        switch(firstLetter)
+        {
+        case eFirstLetter::upperCase:
+            mv.Get << _T("Get"); break;
+        case eFirstLetter::lowerCase:
+            mv.Get << _T("get"); break;
+        }
         mv.Get << method;
     }
     if (setter)
     {
-        if (firstLetter == 0)
-            mv.Set << _T("Set");
-        else if (firstLetter == 1)
-            mv.Set << _T("set");
-
-         mv.Set << method;
+        switch(firstLetter)
+        {
+        case eFirstLetter::upperCase:
+            mv.Set << _T("Set"); break;
+        case eFirstLetter::lowerCase:
+            mv.Set << _T("set"); break;
+        }
+        mv.Set << method;
     }
     m_MemberVars.push_back(mv);
 
@@ -424,6 +428,12 @@ void ClassWizardDlg::OnOKClick(wxCommandEvent& WXUNUSED(event))
     m_TabStr = usestabs ? wxString(_T("\t")) : wxString(_T(' '), tabsize);
     m_EolStr = GetEOLStr();
 
+
+    m_getSetImplementation = static_cast<eImplementation>(cfg->ReadInt(_T("/SetGet/Implementation"), 0));
+    m_parameterName        = static_cast<eParameterName>(cfg->ReadInt(_T("/SetGet/ParameterStyle"), 0));
+
+
+
     // actual file creation starts here
     bool success = DoHeader();
     if (success)
@@ -557,10 +567,6 @@ bool ClassWizardDlg::DoHeader()
     }
     buffer << m_EolStr;
 
-
-    ConfigManager *cfg = Manager::Get()->GetConfigManager(_T("classwizard"));
-    int implementation = cfg->ReadInt(_T("/SetGet/Implementation"), 0);
-    int parameterStyle = cfg->ReadInt(_T("/SetGet/ParameterStyle"), 0);
     bool addnewline = false;
     std::vector<MemberVar>::iterator it = m_MemberVars.begin();
     while( it != m_MemberVars.end() )
@@ -579,19 +585,25 @@ bool ClassWizardDlg::DoHeader()
             }
             buffer << m_TabStr << m_TabStr << (*it).Typ << _T(" ") << (*it).Get
                    << _T("()");
-            if (implementation == 0) // implementation of get/set function is in the header file
+
+            switch(m_getSetImplementation)
             {
-                buffer << _T("{ return ") << (*it).Var << _T("; }") << m_EolStr;
+            case eImplementation::header : // implementation of get/set function is in the header file
+                {
+                    buffer << _T("{ return ") << (*it).Var << _T("; }") << m_EolStr;
+                }
+                break;
+            case eImplementation::source : // implementation of get/set function is in the source file
+                    buffer << _T(";") << m_EolStr;
+                break;
             }
-            else // implementation of get/set function is in the source file
-                buffer << _T(";") << m_EolStr;
 
         }
         if (!(*it).Set.IsEmpty())
         {
             wxString parameterName = _T("val");
             addnewline = true;
-            if (parameterStyle == 1)    // We use the variable name as parameter name
+            if (m_parameterName == eParameterName::variableName)    // We use the variable name as parameter name
                 parameterName = (*it).VarNoPrefix;
 
             if (m_Documentation)
@@ -606,12 +618,19 @@ bool ClassWizardDlg::DoHeader()
             buffer << m_TabStr << m_TabStr << _T("void ") << (*it).Set << _T("(")
                    << (*it).Typ << _T(" ") << parameterName << _T(")");
 
-            if (implementation == 0) // implementation of get/set function is in the header file
+
+            switch(m_getSetImplementation)
             {
-                buffer << m_TabStr <<  _T("{ ") << (*it).Var << _T(" = ") << parameterName << _T("; }") << m_EolStr;
+            case eImplementation::header : // implementation of get/set function is in the header file
+                {
+                    buffer << m_TabStr <<  _T("{ ") << (*it).Var << _T(" = ") << parameterName << _T("; }") << m_EolStr;
+                }
+                break;
+            case eImplementation::source : // implementation of get/set function is in the source file
+                    buffer << _T(";") << m_EolStr;
+                break;
             }
-            else // implementation of get/set function is in the source file
-                buffer << _T(";") << m_EolStr;
+
         }
         ++it;
     }
@@ -774,37 +793,39 @@ bool ClassWizardDlg::DoImpl()
     }
 
 
-    ConfigManager *cfg = Manager::Get()->GetConfigManager(_T("classwizard"));
-    int implementation = cfg->ReadInt(_T("/SetGet/Implementation"), 0);
-    int parameterStyle = cfg->ReadInt(_T("/SetGet/ParameterStyle"), 0);
+
     std::vector<MemberVar>::iterator it = m_MemberVars.begin();
 
     // if we have members and the implementation should be in the source file
-    while (implementation == 1 && it != m_MemberVars.end() )
+    if (m_getSetImplementation == eImplementation::source)
     {
-        if (!(*it).Get.IsEmpty())
+        for (auto member : m_MemberVars )
         {
-            buffer << (*it).Typ << _T(" ") << m_Name << _T("::") << (*it).Get << _T("()") << m_EolStr
-                   << _T("{") << m_EolStr
-                   << m_TabStr << _T("return ") << (*it).Var << _T(";") << m_EolStr
-                   <<  _T("}") << m_EolStr
-                   << m_EolStr;
-        }
-        if (!(*it).Set.IsEmpty())
-        {
-            wxString parameterName = _T("val");
-            if (parameterStyle == 1)    // We use the variable name as parameter name
-                parameterName = (*it).VarNoPrefix;
+            if (!member.Get.IsEmpty())
+            {
+                buffer << member.Typ << _T(" ") << m_Name << _T("::") << member.Get << _T("()") << m_EolStr
+                       << _T("{") << m_EolStr
+                       << m_TabStr << _T("return ") << member.Var << _T(";") << m_EolStr
+                       <<  _T("}") << m_EolStr
+                       << m_EolStr;
+            }
+            if (!member.Set.IsEmpty())
+            {
+                wxString parameterName = _T("val");
+                if (m_parameterName == eParameterName::variableName)    // We use the variable name as parameter name
+                    parameterName = member.VarNoPrefix;
 
-            buffer << _T("void ") << m_Name << _T("::") << (*it).Set <<  _T("(") << (*it).Typ << _T(" ") << parameterName << _T(")") << m_EolStr
-                   << _T("{") << m_EolStr
-                   << m_TabStr << (*it).Var << _T(" = ") << parameterName << _T(";") << m_EolStr
-                   <<  _T("}") << m_EolStr
-                   << m_EolStr;
+                buffer << _T("void ") << m_Name << _T("::") << member.Set <<  _T("(") << member.Typ << _T(" ") << parameterName << _T(")") << m_EolStr
+                       << _T("{") << m_EolStr
+                       << m_TabStr << member.Var << _T(" = ") << parameterName << _T(";") << m_EolStr
+                       <<  _T("}") << m_EolStr
+                       << m_EolStr;
 
+            }
+            ++it;
         }
-        ++it;
     }
+
 
 
     if (m_NameSpaces.GetCount())
