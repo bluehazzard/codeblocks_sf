@@ -455,6 +455,30 @@ void ClassWizardDlg::OnCancelClick(wxCommandEvent& WXUNUSED(event))
 // methods
 // -------
 
+wxString ClassWizardDlg::GetFuncDef(const MemberVar& member, const wxString& className)
+{
+    wxString ret;
+    ret << member.Typ << _T(" ");
+
+    if(!className.IsEmpty())
+        ret << className << _T("::");
+
+    ret << member.Get << _T("()");
+    return ret;
+}
+
+wxString ClassWizardDlg::SetFuncDef(const MemberVar& member, const wxString& parameterName, const wxString& className)
+{
+    wxString ret;
+    ret << _T("void ");
+
+    if(!className.IsEmpty())
+        ret << className << _T("::");
+
+    ret << member.Set << _T("(") << member.Typ << _T(" ") << parameterName << _T(")");
+    return ret;
+}
+
 bool ClassWizardDlg::DoHeader()
 {
     // Create the header file
@@ -583,8 +607,7 @@ bool ClassWizardDlg::DoHeader()
                 buffer << m_TabStr << m_TabStr
                        << _T(" */") << m_EolStr;
             }
-            buffer << m_TabStr << m_TabStr << (*it).Typ << _T(" ") << (*it).Get
-                   << _T("()");
+            buffer << m_TabStr << m_TabStr << GetFuncDef((*it));
 
             switch(m_getSetImplementation)
             {
@@ -615,8 +638,7 @@ bool ClassWizardDlg::DoHeader()
                 buffer << m_TabStr << m_TabStr
                        << _T(" */") << m_EolStr;
             }
-            buffer << m_TabStr << m_TabStr << _T("void ") << (*it).Set << _T("(")
-                   << (*it).Typ << _T(" ") << parameterName << _T(")");
+            buffer << m_TabStr << m_TabStr << SetFuncDef(*it, parameterName);
 
 
             switch(m_getSetImplementation)
@@ -803,7 +825,7 @@ bool ClassWizardDlg::DoImpl()
         {
             if (!member.Get.IsEmpty())
             {
-                buffer << member.Typ << _T(" ") << m_Name << _T("::") << member.Get << _T("()") << m_EolStr
+                buffer << GetFuncDef(member, m_Name) << m_EolStr
                        << _T("{") << m_EolStr
                        << m_TabStr << _T("return ") << member.Var << _T(";") << m_EolStr
                        <<  _T("}") << m_EolStr
@@ -815,7 +837,7 @@ bool ClassWizardDlg::DoImpl()
                 if (m_parameterName == eParameterName::variableName)    // We use the variable name as parameter name
                     parameterName = member.VarNoPrefix;
 
-                buffer << _T("void ") << m_Name << _T("::") << member.Set <<  _T("(") << member.Typ << _T(" ") << parameterName << _T(")") << m_EolStr
+                buffer << SetFuncDef(member, parameterName, m_Name) << m_EolStr
                        << _T("{") << m_EolStr
                        << m_TabStr << member.Var << _T(" = ") << parameterName << _T(";") << m_EolStr
                        <<  _T("}") << m_EolStr

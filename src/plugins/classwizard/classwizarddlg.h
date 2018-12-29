@@ -86,6 +86,9 @@ class ClassWizardDlg : public wxScrollingDialog
         void DoForceDirectory(const wxFileName & filename);
         wxString DoMemVarRepr(const wxString & typ, const wxString & var, const int & scp);
 
+        wxString GetFuncDef(const MemberVar& member, const wxString& className = wxEmptyString);
+        wxString SetFuncDef(const MemberVar& member, const wxString& parameterName, const wxString& className = wxEmptyString);
+
         // member variables
         wxString        m_Header;
         wxString        m_Implementation;
