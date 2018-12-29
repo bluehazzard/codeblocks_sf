@@ -44,6 +44,7 @@ void ClassWizardConfigDlg::LoadSettings()
     XRCCTRL(*this,   "rbFirstLetter",          wxRadioBox)->SetSelection(cfg->ReadInt(_T("/SetGet/FirstLetter"),     0));
     XRCCTRL(*this,   "rbImplementation",       wxRadioBox)->SetSelection(cfg->ReadInt(_T("/SetGet/Implementation"),  0));
     XRCCTRL(*this,   "rbNameGeneration",       wxRadioBox)->SetSelection(cfg->ReadInt(_T("/SetGet/NameGeneration"),  0));
+    XRCCTRL(*this,   "rbSetFunctionParameter", wxRadioBox)->SetSelection(cfg->ReadInt(_T("/SetGet/SetFunctionParameter"),  0));
 
     XRCCTRL(*this,   "txtExtHeader",       wxTextCtrl)->SetValue(cfg->Read(_T("/header_type"),  _T("h")));
     XRCCTRL(*this,   "txtExtSource",       wxTextCtrl)->SetValue(cfg->Read(_T("/source_type"),  _T("cpp")));
@@ -57,6 +58,7 @@ void ClassWizardConfigDlg::SaveSettings()
     cfg->Write(_T("/SetGet/FirstLetter"),       XRCCTRL(*this, "rbFirstLetter",       wxRadioBox)->GetSelection());
     cfg->Write(_T("/SetGet/Implementation"),    XRCCTRL(*this, "rbImplementation",    wxRadioBox)->GetSelection());
     cfg->Write(_T("/SetGet/NameGeneration"),    XRCCTRL(*this, "rbNameGeneration",    wxRadioBox)->GetSelection());
+    cfg->Write(_T("/SetGet/SetFunctionParameter"), XRCCTRL(*this, "rbSetFunctionParameter",    wxRadioBox)->GetSelection());
 
     cfg->Write(_T("/header_type"),    XRCCTRL(*this, "txtExtHeader",    wxTextCtrl)->GetValue());
     cfg->Write(_T("/source_type"),    XRCCTRL(*this, "txtExtSource",    wxTextCtrl)->GetValue());

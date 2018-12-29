@@ -61,6 +61,12 @@ class ClassWizardDlg : public wxScrollingDialog
             allLowerCase
         };
 
+        enum class eSetFunctionParameter
+        {
+            normal,
+            constRef
+        };
+
 
         // events
         void OnUpdateUI(wxUpdateUIEvent& event);
@@ -129,6 +135,7 @@ class ClassWizardDlg : public wxScrollingDialog
 
         eImplementation m_getSetImplementation;
         eParameterName  m_parameterName;
+        eSetFunctionParameter m_setFuncParameter;
 
         DECLARE_EVENT_TABLE()
 };

@@ -431,6 +431,7 @@ void ClassWizardDlg::OnOKClick(wxCommandEvent& WXUNUSED(event))
 
     m_getSetImplementation = static_cast<eImplementation>(cfg->ReadInt(_T("/SetGet/Implementation"), 0));
     m_parameterName        = static_cast<eParameterName>(cfg->ReadInt(_T("/SetGet/ParameterStyle"), 0));
+    m_setFuncParameter     = static_cast<eSetFunctionParameter>(cfg->ReadInt(_T("/SetGet/SetFunctionParameter"), 0));
 
 
 
@@ -460,7 +461,7 @@ wxString ClassWizardDlg::GetFuncDef(const MemberVar& member, const wxString& cla
     wxString ret;
     ret << member.Typ << _T(" ");
 
-    if(!className.IsEmpty())
+    if (!className.IsEmpty())
         ret << className << _T("::");
 
     ret << member.Get << _T("()");
@@ -472,10 +473,23 @@ wxString ClassWizardDlg::SetFuncDef(const MemberVar& member, const wxString& par
     wxString ret;
     ret << _T("void ");
 
-    if(!className.IsEmpty())
+    if (!className.IsEmpty())
         ret << className << _T("::");
 
-    ret << member.Set << _T("(") << member.Typ << _T(" ") << parameterName << _T(")");
+    ret << member.Set << _T("(");
+
+    switch (m_setFuncParameter)
+    {
+    case eSetFunctionParameter::constRef :
+        ret << _T("const ") << member.Typ << _T("& ");
+        break;
+    case eSetFunctionParameter::normal :
+        ret <<  member.Typ << _(" ");
+        break;
+    }
+
+    ret << parameterName << _T(")");
+
     return ret;
 }
 
