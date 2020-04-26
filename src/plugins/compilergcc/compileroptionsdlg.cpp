@@ -561,6 +561,16 @@ void CompilerOptionsDlg::DoFillOthers()
     if (chk)
         chk->SetValue(Manager::Get()->GetConfigManager(_T("compiler"))->ReadBool(_T("/build_progress/bar"), false));
 
+    chk = XRCCTRL(*this, "chkUseRespFiles", wxCheckBox);
+    if (chk)
+        chk->SetValue(Manager::Get()->GetConfigManager(_T("compiler"))->ReadBool(_T("/response_files/use"), false));
+    wxTextCtrl* txt = XRCCTRL(*this, "txtMaxCmdLineLength", wxTextCtrl);
+    if (txt)
+    {
+        txt->SetValue(wxString::Format("%d", Manager::Get()->GetConfigManager(_T("compiler"))->ReadInt(_T("/response_files/max_length"), 1000)));
+        txt->Enable(Manager::Get()->GetConfigManager(_T("compiler"))->ReadBool(_T("/response_files/use"), false));
+    }
+
     chk = XRCCTRL(*this, "chkBuildProgressPerc", wxCheckBox);
     if (chk)
         chk->SetValue(Manager::Get()->GetConfigManager(_T("compiler"))->ReadBool(_T("/build_progress/percentage"), false));
@@ -2809,6 +2819,8 @@ void CompilerOptionsDlg::OnUpdateUI(cb_unused wxUpdateUIEvent& event)
         XRCCTRL(*this, "chkFullHtmlLog", wxCheckBox)->Enable(XRCCTRL(*this, "chkSaveHtmlLog", wxCheckBox)->IsChecked());
         XRCCTRL(*this, "btnIgnoreRemove", wxButton)->Enable(XRCCTRL(*this, "lstIgnore", wxListBox)->GetCount()>0);
         XRCCTRL(*this, "btnIgnoreAdd", wxButton)->Enable(XRCCTRL(*this, "txtIgnore", wxTextCtrl)->GetValue().Trim().Len()>0);
+
+        XRCCTRL(*this, "txtMaxCmdLineLength", wxTextCtrl)->Enable(XRCCTRL(*this, "chkUseRespFiles", wxCheckBox)->IsChecked());
     }
 } // OnUpdateUI
 
@@ -2846,6 +2858,27 @@ void CompilerOptionsDlg::OnApply()
             cfg->Write(_T("/build_progress/percentage"), (bool)chk->IsChecked());
             m_Compiler->m_LogBuildProgressPercentage = chk->IsChecked();
         }
+
+        // Response files
+        chk = XRCCTRL(*this, "chkUseRespFiles", wxCheckBox);
+        if (chk)
+        {
+            cfg->Write(_T("/response_files/use"), (bool)chk->IsChecked());
+            m_Compiler->m_UseRespnonseFiles = chk->IsChecked();
+        }
+        wxTextCtrl* txt = XRCCTRL(*this, "txtMaxCmdLineLength", wxTextCtrl);
+        if (txt)
+        {
+            wxString value = txt->GetValue();
+            long v = 0;
+            value.ToLong(&v);
+            if(v < 100) // The minimal command line is set to 100. We do not want to split the compiler program name
+                v = 100;
+            cfg->Write(_T("/response_files/max_length"), (int) v);
+            m_Compiler->m_MaxCommandLineLength = v;
+        }
+        // ----------------------------------------------
+
         wxSpinCtrl* spn = XRCCTRL(*this, "spnParallelProcesses", wxSpinCtrl);
         if (spn && (((int)spn->GetValue()) != cfg->ReadInt(_T("/parallel_processes"), 0)))
         {

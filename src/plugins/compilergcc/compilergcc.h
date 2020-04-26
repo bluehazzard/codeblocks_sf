@@ -152,6 +152,9 @@ class CompilerGCC : public cbCompilerPlugin
         void OnClearErrors(wxCommandEvent& event);
         void OnUpdateUI(wxUpdateUIEvent& event);
         void OnConfig(wxCommandEvent& event);
+
+        bool UseResponseFiles()         { return m_UseRespnonseFiles; };
+        size_t MaxCommandLineLength()   { return m_MaxCommandLineLength; };
     private:
         friend class CompilerOptionsDlg;
 
@@ -329,6 +332,10 @@ class CompilerGCC : public cbCompilerPlugin
         size_t m_MaxProgress;
         size_t m_CurrentProgress;
         bool   m_LogBuildProgressPercentage;
+
+        // Use response files
+        bool   m_UseRespnonseFiles;
+        size_t m_MaxCommandLineLength;
 
         cbArtProvider *m_pArtProvider;
 

@@ -418,6 +418,9 @@ void CompilerGCC::OnAttach()
     if (hasBuildProg)
         m_pLog->AddBuildProgressBar();
 
+    m_UseRespnonseFiles = Manager::Get()->GetConfigManager(_T("compiler"))->ReadBool(_T("/response_files/use"), false);
+    m_MaxCommandLineLength = Manager::Get()->GetConfigManager(_T("compiler"))->ReadInt(_T("/response_files/max_length"), 1000);
+
     // set default compiler for new projects
     CompilerFactory::SetDefaultCompiler(Manager::Get()->GetConfigManager(_T("compiler"))->Read(_T("/default_compiler"), _T("gcc")));
     LoadOptions();

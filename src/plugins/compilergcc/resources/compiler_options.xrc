@@ -1250,6 +1250,36 @@
 													<border>8</border>
 												</object>
 												<object class="sizeritem">
+													<object class="wxCheckBox" name="chkUseRespFiles">
+														<label>Use response files for to long command lines</label>
+													</object>
+													<flag>wxTOP|wxLEFT|wxRIGHT|wxEXPAND</flag>
+													<border>8</border>
+												</object>
+												<object class="sizeritem">
+													<object class="wxBoxSizer">
+														<object class="sizeritem">
+															<object class="wxStaticText" name="ID_STATICTEXT2">
+																<label>Max command line length before using response files (&gt;100):</label>
+															</object>
+															<flag>wxLEFT</flag>
+															<border>24</border>
+															<option>1</option>
+														</object>
+														<object class="sizeritem">
+															<object class="wxTextCtrl" name="txtMaxCmdLineLength" />
+															<flag>wxLEFT</flag>
+															<border>24</border>
+														</object>
+													</object>
+													<flag>wxALIGN_LEFT</flag>
+												</object>
+												<object class="sizeritem">
+													<object class="wxStaticLine" name="ID_STATICLINE9" />
+													<flag>wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND</flag>
+													<border>8</border>
+												</object>
+												<object class="sizeritem">
 													<object class="wxStaticBoxSizer">
 														<label>Rebuild Workspace / Project</label>
 														<orient>wxVERTICAL</orient>

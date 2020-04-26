@@ -60,6 +60,8 @@ class DirectCommands
         MyFilesArray GetProjectFilesSortedByWeight(ProjectBuildTarget* target, bool compile, bool link) const;
         void         AddCommandsToArray(const wxString& cmds, wxArrayString& array, bool isWaitCmd = false, bool isLinkCmd = false) const;
 
+        void         CheckForToLongCommandLine(wxString& compiler_cmd, wxArrayString& array, const wxString& basename ,const wxString& path) const;
+
         int                       m_PageIndex;
         CompilerGCC*              m_pCompilerPlugin;
         Compiler*                 m_pCompiler;

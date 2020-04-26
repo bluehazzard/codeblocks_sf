@@ -191,6 +191,40 @@ wxArrayString DirectCommands::CompileFile(ProjectBuildTarget* target, ProjectFil
     return ret;
 }
 
+void DirectCommands::CheckForToLongCommandLine(wxString& compiler_cmd, wxArrayString& array, const wxString& basename ,const wxString& path) const
+{
+    if (m_pCompilerPlugin->UseResponseFiles() && compiler_cmd.length() > m_pCompilerPlugin->MaxCommandLineLength())
+    {
+        const wxFileName responseFileName(path, basename, "respFile");
+        // Path handling has to be so complicated because of wxWidgets error https://trac.wxwidgets.org/ticket/831
+        // The path for creating the folder structure has to be relative
+        wxFileName relative = responseFileName;
+        relative.MakeRelativeTo(wxFileName::GetCwd());
+        if (!wxFileName::Mkdir(relative.GetPath() , wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL))
+        {
+            array.Add(COMPILER_ERROR_LOG + _("Could not create directory for ") + responseFileName.GetFullPath() );
+            return;
+        }
+        array.Add(COMPILER_NOTE_LOG + _("Command line is to long: Using responseFile:  ") + responseFileName.GetFullPath() );
+        array.Add(COMPILER_NOTE_LOG + _("Complete command line:  ") + compiler_cmd );
+
+        const size_t startPos = compiler_cmd.rfind(' ', m_pCompilerPlugin->MaxCommandLineLength() - responseFileName.GetFullPath().length());
+        wxString restCommand = compiler_cmd.Right(compiler_cmd.length() - startPos);
+        restCommand.Replace("\\", "\\\\");  // escaping Needed for windows
+        wxFFile file(responseFileName.GetFullPath(), "w");
+        if (!file.IsOpened())
+        {
+            array.Add(COMPILER_ERROR_LOG + _("Could not open response file in ") + responseFileName.GetFullPath());
+            return;
+        }
+
+        file.Write(restCommand);
+        file.Close();
+        compiler_cmd = compiler_cmd.Left(startPos) + " @" + responseFileName.GetFullPath();
+
+    }
+}
+
 wxArrayString DirectCommands::GetCompileFileCommand(ProjectBuildTarget* target, ProjectFile* pf) const
 {
     wxArrayString ret;
@@ -300,6 +334,8 @@ wxArrayString DirectCommands::GetCompileFileCommand(ProjectBuildTarget* target, 
         default:
             break;
     }
+
+    CheckForToLongCommandLine(compiler_cmd, ret, pf->GetBaseName() ,object_dir);
 
     AddCommandsToArray(compiler_cmd, ret);
 
@@ -851,6 +887,8 @@ wxArrayString DirectCommands::GetTargetLinkCommands(ProjectBuildTarget* target, 
         // for an explanation of the following, see GetTargetCompileCommands()
         if (target && ret.GetCount() != 0)
             ret.Add(COMPILER_TARGET_CHANGE + target->GetTitle());
+
+        CheckForToLongCommandLine(compilerCmd, ret, target->GetTitle() , target->GetObjectOutput());
 
         // the 'true' will make sure all commands will be prepended by
         // COMPILER_WAIT signal
