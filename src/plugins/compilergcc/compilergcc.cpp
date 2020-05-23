@@ -418,9 +418,6 @@ void CompilerGCC::OnAttach()
     if (hasBuildProg)
         m_pLog->AddBuildProgressBar();
 
-    m_UseRespnonseFiles = Manager::Get()->GetConfigManager(_T("compiler"))->ReadBool(_T("/response_files/use"), false);
-    m_MaxCommandLineLength = Manager::Get()->GetConfigManager(_T("compiler"))->ReadInt(_T("/response_files/max_length"), 1000);
-
     // set default compiler for new projects
     CompilerFactory::SetDefaultCompiler(Manager::Get()->GetConfigManager(_T("compiler"))->Read(_T("/default_compiler"), _T("gcc")));
     LoadOptions();
@@ -3636,7 +3633,12 @@ void CompilerGCC::LogMessage(const wxString& message, CompilerLineType lt, LogTa
         msgInput = message;
 
     if (msgInput.StartsWith(COMPILER_NOTE_ID_LOG, &msg))
-        LogWarningOrError(lt, 0, wxEmptyString, wxEmptyString, msg);
+        LogWarningOrError(lt, nullptr, wxEmptyString, wxEmptyString, msg);
+    else if(msgInput.StartsWith(COMPILER_ONLY_NOTE_ID_LOG, &msg))
+    {
+        LogWarningOrError(lt, nullptr, wxEmptyString, wxEmptyString, msg);
+        updateProgress = false;
+    }
     else if (msgInput.StartsWith(COMPILER_WARNING_ID_LOG, &msg))
     {
         if (lt != cltError)
