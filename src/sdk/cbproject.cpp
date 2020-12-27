@@ -1879,14 +1879,130 @@ void cbProject::ProjectFileRenamed(ProjectFile* pf)
     }
 }
 
-void cbProject::SetGlobs(const std::vector<Glob>& globs)
+void cbProject::RemoveGlob(const std::shared_ptr<ProjectGlob>& glob)
 {
-    m_Globs = globs;
+
+    auto itr = std::find(m_Globs.begin(), m_Globs.end(), glob);
+    if (itr != m_Globs.end())
+        m_Globs.erase(itr);
+
+    std::vector<ProjectFile*> filesToRemove;
+    for (ProjectFile* file : m_Files)
+    {
+        if( file->globId == glob->GetId())
+            filesToRemove.push_back(file);
+    }
+
+    for (ProjectFile* file : filesToRemove)
+    {
+        RemoveFile(file);
+    }
+
+    if (filesToRemove.size() > 0)
+        Touch();
 }
 
-std::vector<cbProject::Glob> cbProject::GetGlobs() const
+void cbProject::RemoveGlobs(const std::vector<std::shared_ptr<ProjectGlob>>& globs)
+{
+
+    for (auto toRemoveItr = globs.begin(); toRemoveItr != globs.end(); toRemoveItr++)
+    {
+        const auto itr = std::find(m_Globs.begin(), m_Globs.end(), *toRemoveItr);
+        if (itr != m_Globs.end())
+            m_Globs.erase(itr);
+    }
+    std::vector<ProjectFile*> filesToRemove;
+    for (ProjectFile* file : m_Files)
+    {
+        bool found = false;
+        // File is in no glob
+        if (file->globId == -1)
+            continue;
+        // search all remaining globs for this file id
+        for (const auto& remainingGlob : m_Globs)
+        {
+            if (remainingGlob->GetId() == file->globId)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            filesToRemove.push_back(file);
+    }
+
+    for (ProjectFile* file : filesToRemove)
+    {
+        RemoveFile(file);
+    }
+
+    if (filesToRemove.size() > 0)
+        Touch();
+}
+
+void cbProject::AddGlob(const std::shared_ptr<ProjectGlob> glob)
+{
+    if (glob && glob->IsValid() && SearchGlob(glob->GetId()).expired())
+    {
+        m_Globs.push_back(glob);
+        Touch();
+    }
+}
+
+void cbProject::SetGlobs(std::vector<std::shared_ptr<ProjectGlob>>& globs)
+{
+    std::sort(globs.begin(), globs.end());
+    std::vector<std::shared_ptr<ProjectGlob>> toRemove;
+    for (std::shared_ptr<ProjectGlob>& glob : m_Globs)
+    {
+        if (!std::binary_search(globs.begin(), globs.end(), glob))
+        {
+            toRemove.push_back(glob);
+        }
+    }
+    RemoveGlobs(toRemove);
+    m_Globs = globs;
+    Touch();
+}
+
+const std::vector<std::shared_ptr<ProjectGlob>> cbProject::GetGlobs() const
 {
     return m_Globs;
+}
+
+std::weak_ptr<ProjectGlob> cbProject::SearchGlob(wxString path, wxString wildCard, bool recursive) const
+{
+    ProjectGlob glob = ProjectGlob(path, wildCard, recursive);
+    return SearchGlob(glob.GetId());
+}
+
+std::weak_ptr<ProjectGlob> cbProject::SearchGlob(long id) const
+{
+    for (const std::shared_ptr<ProjectGlob>& gl : m_Globs)
+    {
+        if (gl->GetId() == id)
+        {
+            return gl;
+        }
+    }
+    return std::shared_ptr<ProjectGlob>();
+}
+
+std::weak_ptr<ProjectGlob> cbProject::SearchGlob(wxString id) const
+{
+    long tmp;
+    if (id.ToLong(&tmp))
+    {
+        for (const std::shared_ptr<ProjectGlob>& gl : m_Globs)
+        {
+            if (gl->GetId() == tmp)
+            {
+                return gl;
+            }
+        }
+    }
+
+    return std::shared_ptr<ProjectGlob>();
 }
 
 wxString cbGetDynamicLinkerPathForTarget(cbProject *project, ProjectBuildTarget* target)

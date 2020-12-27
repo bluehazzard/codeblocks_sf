@@ -8,6 +8,7 @@
 
 #include <wx/datetime.h>
 #include <wx/dynarray.h>
+#include <wx/hash.h>
 #include <wx/hashmap.h>
 #include <wx/treectrl.h>
 
@@ -20,6 +21,7 @@
 
 #include <map>
 #include <vector>
+#include <functional>
 
 // forward decl
 class cbProject;
@@ -85,6 +87,79 @@ enum PCHMode
     pchSourceDir = 0, /// In a dir (named by the PCH) on the same level as the source header (default).
     pchObjectDir,     /// In the objects output dir, along with other object files.
     pchSourceFile     /// In a file alongside the source header (with .gch appended).
+};
+
+class ProjectGlob
+{
+    public:
+        ProjectGlob(const wxString& path, const wxString& wildCard, bool recursive) : m_Path(path), m_WildCard(wildCard), m_Recursive(recursive)
+        {
+           UpdateId();
+        }
+
+        ProjectGlob(long id, const wxString& path, const wxString& wildCard, bool recursive) : m_Id(id), m_Path(path), m_WildCard(wildCard), m_Recursive(recursive)
+        {
+        }
+
+        ProjectGlob()
+        {
+            m_Id = -1;
+        }
+
+        bool operator==(const ProjectGlob& other) const
+        {
+            if(other.GetId() != this->GetId())
+                return false;
+            // If the ID is the same, we make a deep comparison, to evade collisions...
+            return this->m_WildCard == other.m_WildCard && this->m_Recursive == other.m_Recursive && this->m_Path == other.m_Path;
+        }
+
+        bool IsValid()           const { return !m_Path.IsEmpty(); }
+        long GetId()             const { return m_Id; }
+        wxString GetIdAsString() const { wxString ret; ret << m_Id; return ret; }
+        wxString GetPath()       const { return m_Path; }
+        wxString GetWildCard()   const { return m_WildCard; }
+        bool GetRecursive()      const { return m_Recursive; }
+
+        void Set(const wxString& path, const wxString& wildCard, bool rec)
+        {
+            m_Path = path;
+            m_WildCard = wildCard;
+            m_Recursive = rec;
+            UpdateId();
+        }
+
+        void SetGetPath(const wxString& path)
+        {
+            m_Path = path;
+            UpdateId();
+        }
+
+        void SetWildCard(const wxString& wildCard)
+        {
+            m_WildCard = wildCard;
+            UpdateId();
+        }
+
+        void SetRecursive(bool rec)
+        {
+            m_Recursive = rec;
+            UpdateId();
+        }
+
+    private:
+
+        void UpdateId()
+        {
+             m_Id = wxHashTable::MakeKey( m_Path.ToStdString() + m_WildCard.ToStdString() + (m_Recursive ? "1" : "0"));
+        }
+
+        long m_Id;
+
+        wxString m_Path;
+        wxString m_WildCard;
+        bool m_Recursive;
+
 };
 
 /** @brief Represents a Code::Blocks project.
@@ -435,23 +510,45 @@ class DLLIMPORT cbProject : public CompileTargetBase
           */
         bool RemoveFile(ProjectFile* pf);
 
-        struct Glob
-        {
-            wxString m_Path;
-            wxString m_WildCard;
-            bool m_Recursive;
-            Glob(const wxString& path, const wxString& wildCard, bool recursive) : m_Path(path), m_WildCard(wildCard), m_Recursive(recursive) {}
-        };
-
-        /** Set the globs to the project, this are directory paths do retrieve files from to be added to the project, the path can be searched recursively
-          * @param globs the globs to add to the project.
+        /** Remove a glob from the project
+          * @param globs the globs to remove from project.
           */
-        void SetGlobs(const std::vector<Glob>& globs);
+        void RemoveGlob(const std::shared_ptr<ProjectGlob>& glob);
+        void RemoveGlobs(const std::vector<std::shared_ptr<ProjectGlob>>& globs);
+
+        /** Set the globs to the project. These are directories that are scanned automatically and
+          * the files found are added or removed from the file. The path can be searched
+          * recursively.
+          * This function checks the difference from the current set globs and removes the files
+          * automatically if the glob is not present in the new globs vector.
+          * The Project is marked as modified
+          * @param globs the globs to set at the project
+          */
+        void SetGlobs(std::vector<std::shared_ptr<ProjectGlob>>& globs);
+
+        /** Add a new glob to the project.
+          * @param glob the glob to add to the project.
+          */
+        void AddGlob(const std::shared_ptr<ProjectGlob> glob);
 
         /** Retrieve the current globs from the project
-          * @return globs the globs to add to the project.
           */
-        std::vector<Glob> GetGlobs() const;
+        const std::vector<std::shared_ptr<ProjectGlob>> GetGlobs() const;
+
+        /** Check if the glob exists and return it
+          * @return if found a valid weak pointer, if not found the pointer is invalid
+          */
+        std::weak_ptr<ProjectGlob> SearchGlob(wxString path, wxString wildCard, bool recursive) const;
+
+        /** Check if the glob exists and return it
+          * @return if found a valid weak pointer, if not found the pointer is invalid
+          */
+        std::weak_ptr<ProjectGlob> SearchGlob(long id) const;
+
+        /** Check if the glob exists and return it
+          * @return if found a valid weak pointer, if not found the pointer is invalid
+          */
+        std::weak_ptr<ProjectGlob> SearchGlob(wxString id) const;
 
         /** Convenience function for remembering the project's tree state when refreshing it.
           * @return An array of strings containing the tree-path names of expanded nodes.
@@ -740,7 +837,7 @@ class DLLIMPORT cbProject : public CompileTargetBase
         bool                   m_CustomMakefile;
         mutable wxString       m_MakefileExecutionDir;
 
-        std::vector<Glob> m_Globs;
+        std::vector<std::shared_ptr<ProjectGlob>> m_Globs;
         FilesList         m_Files;
         ProjectFileArray  m_FileArray;
         wxArrayString     m_ExpandedNodes;
@@ -778,5 +875,4 @@ DLLIMPORT wxString cbGetDynamicLinkerPathForTarget(cbProject *project, ProjectBu
 DLLIMPORT wxString cbMergeLibPaths(const wxString &oldPath, const wxString &newPath);
 
 #endif // CBPROJECT_H
-
 
