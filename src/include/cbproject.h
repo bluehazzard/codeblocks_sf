@@ -143,7 +143,7 @@ class ProjectGlob
         /** \brief Check if this glob is valid
          * \return true if all parameter are valid for this glob
          */
-        bool IsValid()           const { return !m_Path.IsEmpty(); }
+        bool IsValid()           const { return !m_Path.IsEmpty() && m_Id != -1; }
 
         long GetId()             const { return m_Id; }
         wxString GetIdAsString() const { wxString ret; ret << m_Id; return ret; }
@@ -159,7 +159,7 @@ class ProjectGlob
             UpdateId();
         }
 
-        void SetGetPath(const wxString& path)
+        void SetPath(const wxString& path)
         {
             m_Path = path;
             UpdateId();
