@@ -177,6 +177,26 @@ class ProjectGlob
             UpdateId();
         }
 
+        /** \brief fnv1a hash function (http://www.isthe.com/chongo/tech/comp/fnv/index.html)
+         * We use the 32 bit version on a 64 bit integer, so we are sure that we can use -1 for an
+         * invalid id
+         *
+         * \param input const wxString& Input string
+         * \return int64_t the hash guaranteed to be positive
+         *
+         */
+        static int64_t fnv1a(const wxString& input)
+        {
+            uint32_t ret = 2166136261;
+            const wxStringCharType *p = input.wx_str();
+            while( *p )
+            {
+                ret ^= *p++;
+                ret *= 16777619;
+            }
+            return (int64_t) ret;  // Make sure we are always positive
+        }
+
     private:
 
         /** \brief Calculate the id from all variables
@@ -184,10 +204,10 @@ class ProjectGlob
          */
         void UpdateId()
         {
-             m_Id = wxHashTable::MakeKey( m_Path.ToStdString() + m_WildCard.ToStdString() + (m_Recursive ? "1" : "0"));
+             m_Id = fnv1a( m_Path.ToStdString() + m_WildCard.ToStdString() + (m_Recursive ? "1" : "0"));
         }
 
-        long m_Id;
+        int64_t m_Id;
 
         wxString m_Path;
         wxString m_WildCard;

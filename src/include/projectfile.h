@@ -191,7 +191,7 @@ class DLLIMPORT ProjectFile
         wxArrayString buildTargets;
 
         /** If this file is part of a project glob, the id for glob will be stored here, -1 otherwise **/
-        int globId;
+        int64_t globId;
 
         /** A string that represents the virtual folder this file will appear in.
           * This is a relative path which doesn't have to exist in the filesystem
