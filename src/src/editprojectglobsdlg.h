@@ -17,7 +17,7 @@ class EditProjectGlobsDlg: public wxDialog
 {
 	public:
 
-		EditProjectGlobsDlg(const std::shared_ptr<ProjectGlob> glob, wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
+		EditProjectGlobsDlg(const ProjectGlob& glob, wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
 		virtual ~EditProjectGlobsDlg();
 
 		//(*Declarations(EditProjectGlobsDlg)
@@ -28,7 +28,7 @@ class EditProjectGlobsDlg: public wxDialog
 		wxTextCtrl* txtWildcart;
 		//*)
 
-		void WriteGlob();
+		ProjectGlob WriteGlob();
 
 	protected:
 
@@ -47,7 +47,7 @@ class EditProjectGlobsDlg: public wxDialog
 		void OnOtherClick(wxCommandEvent& event);
 		//*)
 
-		std::shared_ptr<ProjectGlob> m_GlobObj;
+		ProjectGlob m_GlobObj;
 
 		DECLARE_EVENT_TABLE()
 };

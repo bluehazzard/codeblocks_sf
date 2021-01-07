@@ -952,6 +952,8 @@ void splitPath(wxString path, std::vector<std::string>& out)
 wxString makePathRelativeIfNeeded(const wxString& path, const wxString& basePath)
 {
     // This code is inspired heavily from the boost::filesystem::relative function.
+    // This code is used instead of the wxWidgets internal function, because it is
+    // ~1000 times faster on my machine
     // ! WE DO NOT HANDLE SYMLINKS !
 
     if (is_relative(path))
@@ -1051,6 +1053,12 @@ std::vector<wxString> filterOnWildcards(const wxArrayString& files, const wxStri
     return finalFiles;
 }
 
+void LogTime(const wxString& message, long time)
+{
+    if(time > 100)
+        Manager::Get()->GetLogManager()->Log(wxString::Format(message, time / 1000.0) );
+}
+
 std::vector<wxString> filesInDir(const wxString& directory, const wxString& wildCard, bool recursive, const wxString& basePath)
 {
     const wxString directoryPath = makePathAbsoluteIfNeeded(directory, basePath);
@@ -1064,37 +1072,38 @@ std::vector<wxString> filesInDir(const wxString& directory, const wxString& wild
     wxStopWatch timer;
     wxArrayString filesUnfiltered;
     wxDir::GetAllFiles(directoryPath, &filesUnfiltered, wxEmptyString, flags);
-    Manager::Get()->GetLogManager()->Log(wxString::Format("wxDir::GetAllFiles %f s", timer.Time() / 1000.0) );
+    LogTime("wxDir::GetAllFiles %f s", timer.Time());
     timer.Start();
     filesUnfiltered = makePathsRelativeIfNeeded(filesUnfiltered, basePath);
-    Manager::Get()->GetLogManager()->Log(wxString::Format("makePathsRelativeIfNeeded %f s", timer.Time() / 1000.0) );
+    LogTime("makePathsRelativeIfNeeded %f s", timer.Time());
     timer.Start();
     std::vector<wxString> ret = filterOnWildcards(filesUnfiltered, wildCard);
-    Manager::Get()->GetLogManager()->Log(wxString::Format("filterOnWildcards %f s", timer.Time() / 1000.0) );
+    LogTime("filterOnWildcards %f s", timer.Time());
     return ret;
 }
+
 } // namespace
 
-bool ProjectLoader::UpdateGlob(std::shared_ptr<ProjectGlob> glob)
+bool ProjectLoader::UpdateGlob(const ProjectGlob& glob)
 {
     wxStopWatch timer;
     bool modified = false;
-    const wxString directory = glob->GetPath();
-    const wxString wildCard = glob->GetWildCard();
-    const bool isRecursive = glob->GetRecursive();
+    const wxString directory = glob.GetPath();
+    const wxString wildCard = glob.GetWildCard();
+    const bool isRecursive = glob.GetRecursive();
     std::vector<wxString> globFiles = filesInDir(directory, wildCard, isRecursive, m_pProject->GetBasePath());
-    Manager::Get()->GetLogManager()->Log(wxString::Format("Loading directories took %f s", timer.Time() / 1000.0) );
+    LogTime("Loading directories took %f s", timer.Time());
     timer.Start();
     // Sort the paths so we can use binary_search
     std::sort(globFiles.begin(), globFiles.end());
-    Manager::Get()->GetLogManager()->Log(wxString::Format("Sorting took %f s", timer.Time() / 1000.0) );
+    LogTime("Sorting took %f s", timer.Time());
     timer.Start();
     std::vector<ProjectFile*> projectGlobFiles;     // We have to search in this files if the glob is present
     std::vector<ProjectFile*> projectFilesToRemove; // This files are in this glob, but are no longer on the file system
     // First search for valid project files (glob id) and also for project files we have to remove
-    for (const auto file : m_pProject->GetFilesList())
+    for (ProjectFile* file : m_pProject->GetFilesList())
     {
-        if (file->globId == glob->GetId())
+        if (file->globId == glob.GetId())
         {
             bool fileExists = std::binary_search(globFiles.cbegin(), globFiles.cend(), file->relativeFilename);
             if (!fileExists)
@@ -1103,18 +1112,18 @@ bool ProjectLoader::UpdateGlob(std::shared_ptr<ProjectGlob> glob)
                 projectGlobFiles.push_back(file);
         }
     }
-    Manager::Get()->GetLogManager()->Log(wxString::Format("First loop took %f s", timer.Time() / 1000.0) );
+    LogTime("First loop took %f s", timer.Time());
     timer.Start();
     if(projectFilesToRemove.size() > 0)
         modified = true;
     // Now remove all files from the project that are not present on the filesystem
     for(ProjectFile* pf :  projectFilesToRemove)
         m_pProject->RemoveFile(pf);
-    Manager::Get()->GetLogManager()->Log(wxString::Format("Removing took %f s", timer.Time() / 1000.0) );
+    LogTime("Removing took %f s", timer.Time());
     timer.Start();
     // Now lets sort the valid project files for a fast binary search
     std::sort(projectGlobFiles.begin(), projectGlobFiles.end(),[](ProjectFile *a,ProjectFile *b){ return a->relativeFilename < b->relativeFilename; } );
-    Manager::Get()->GetLogManager()->Log(wxString::Format("Second sorting took %f s", timer.Time() / 1000.0) );
+    LogTime("Second sorting took %f s", timer.Time());
     timer.Start();
     // We have to define a custom comparator, to compare wxString <-> ProjectFile
     struct Comparator
@@ -1135,7 +1144,6 @@ bool ProjectLoader::UpdateGlob(std::shared_ptr<ProjectGlob> glob)
         wxStopWatch searchTimer;
         searchTimer.Start();
         bool sear = std::binary_search(projectGlobFiles.cbegin(), projectGlobFiles.cend(), file, Comparator());
-        //Manager::Get()->GetLogManager()->Log(wxString::Format("Search took %f s result: %d", searchTimer.Time() / 1000.0, sear ? 1 : 0 ));
         if (!sear)
         {
             ProjectFile* pf = m_pProject->AddFile(-1, UnixFilename(file));
@@ -1146,11 +1154,11 @@ bool ProjectLoader::UpdateGlob(std::shared_ptr<ProjectGlob> glob)
                 modified = true;
                 const TiXmlElement dummyUnitWithoutOptions("Unit");
                 DoUnitOptions(&dummyUnitWithoutOptions, pf);
-                pf->globId = glob->GetId();
+                pf->globId = glob.GetId();
             }
         }
     }
-    Manager::Get()->GetLogManager()->Log(wxString::Format("Adding took %f s", timer.Time() / 1000.0) );
+    LogTime("Adding took %f s", timer.Time() );
     timer.Start();
 
     return modified;
@@ -1178,16 +1186,16 @@ void ProjectLoader::DoUnits(const TiXmlElement* parentNode)
         {
             const bool isRecursive = (recursive == 1) ? true:false;
 
-            std::shared_ptr<ProjectGlob> glob;
-            long idNr = 0;
-            if(!id.ToLong(&idNr))
+            ProjectGlob glob;
+            long long idNr = -0;
+            if(!id.ToLongLong(&idNr))
             {
                   Manager::Get()->GetLogManager()->DebugLog(_T("Can't read glob id for glob ") + directory);
-                  glob = std::make_shared<ProjectGlob>(directory, wildCard, isRecursive);
+                  glob = ProjectGlob(directory, wildCard, isRecursive);
             }
             else
             {
-                glob = std::make_shared<ProjectGlob>(idNr, directory, wildCard, isRecursive);
+                glob = ProjectGlob((GlobId) idNr, directory, wildCard, isRecursive);
             }
 
             m_pProject->AddGlob(glob);
@@ -1286,14 +1294,14 @@ bool ProjectLoader::DoUnitOptions(const TiXmlElement* parentNode, ProjectFile* f
         if (node->Attribute("glob"))
         {
             wxString id = cbC2U(node->Attribute("glob"));
-            std::shared_ptr<ProjectGlob> glob = m_pProject->SearchGlob(id).lock();
-            if (!glob)
+            ProjectGlob glob = m_pProject->SearchGlob(id);
+            if (!glob.IsValid())
             {
                 Manager::Get()->GetLogManager()->DebugLog(F(_T("Could not find project glob with id %s for file %s"), id, file->GetBaseName().wx_str()));
                 return false;
             }
             else
-                file->globId = glob->GetId();
+                file->globId = glob.GetId();
         }
 
         node = node->NextSiblingElement("Option");
@@ -1717,12 +1725,12 @@ bool ProjectLoader::ExportTargetAsProject(const wxString& filename, const wxStri
 
     ProjectFileArray pfa(ProjectFile::CompareProjectFiles);
 
-    for (const std::shared_ptr<ProjectGlob>& glob : m_pProject->GetGlobs())
+    for (const ProjectGlob& glob : m_pProject->GetGlobs())
     {
-        TiXmlElement *element = AddElement(prjnode, "UnitsGlob", "directory", glob->GetPath());
-        element->SetAttribute("wildcard", glob->GetWildCard());
-        element->SetAttribute("recursive", glob->GetRecursive() ? 1 : 0);
-        element->SetAttribute("id", glob->GetId());
+        TiXmlElement *element = AddElement(prjnode, "UnitsGlob", "directory", glob.GetPath());
+        element->SetAttribute("wildcard", glob.GetWildCard());
+        element->SetAttribute("recursive", glob.GetRecursive() ? 1 : 0);
+        element->SetAttribute("id", wxString::Format("%lld", glob.GetId()));
     }
 
     for (FilesList::iterator it = m_pProject->GetFilesList().begin(); it != m_pProject->GetFilesList().end(); ++it)

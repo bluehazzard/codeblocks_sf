@@ -156,9 +156,9 @@ class ProjectManagerUI : public wxEvtHandler, public cbProjectManagerUI
 
         struct FileSystemEventObject : public wxObject
         {
-            FileSystemEventObject(cbProject* pj, std::shared_ptr<ProjectGlob> gl) : project(pj), glob(gl) {};
+            FileSystemEventObject(cbProject* pj,ProjectGlob gl) : project(pj), glob(gl) {};
             cbProject* project;
-            std::shared_ptr<ProjectGlob> glob;
+            ProjectGlob glob;
 
             bool operator==(const FileSystemEventObject& rhs) const
             {

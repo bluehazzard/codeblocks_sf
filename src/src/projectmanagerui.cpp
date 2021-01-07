@@ -372,14 +372,14 @@ void ProjectManagerUI::ReloadFileSystemWatcher(cbProject* prj)
     std::vector<FileSystemWatcher> projectWatches;
     ProjectLoader loader(prj);
     bool refresh = false;
-    for (const std::shared_ptr<ProjectGlob>& glob : prj->GetGlobs())
+    for (const ProjectGlob& glob : prj->GetGlobs())
     {
         FileSystemWatcher newWatcher;
         newWatcher.watcher = std::unique_ptr<wxFileSystemWatcher>(new wxFileSystemWatcher());
-        wxFileName fname = wxFileName::DirName(glob->GetPath());
+        wxFileName fname = wxFileName::DirName(glob.GetPath());
         if (fname.IsRelative())
             fname.MakeAbsolute(wxFileName(prj->GetFilename()).GetPath());
-        if (glob->GetRecursive())
+        if (glob.GetRecursive())
             newWatcher.watcher->AddTree(fname, wxFSW_EVENT_CREATE | wxFSW_EVENT_DELETE | wxFSW_EVENT_RENAME);
         else
             newWatcher.watcher->Add(fname, wxFSW_EVENT_CREATE | wxFSW_EVENT_DELETE | wxFSW_EVENT_RENAME);
@@ -422,14 +422,14 @@ void ProjectManagerUI::UpdateActiveProject(cbProject* oldProject, cbProject* new
     std::vector<FileSystemWatcher> projectWatches;
     ProjectLoader loader(newProject);
 
-    for (const std::shared_ptr<ProjectGlob>& glob : newProject->GetGlobs())
+    for (const ProjectGlob& glob : newProject->GetGlobs())
     {
         FileSystemWatcher newWatcher;
         newWatcher.watcher = std::unique_ptr<wxFileSystemWatcher>(new wxFileSystemWatcher());
-        wxFileName fname = wxFileName::DirName(glob->GetPath());
+        wxFileName fname = wxFileName::DirName(glob.GetPath());
         if (fname.IsRelative())
             fname.MakeAbsolute(wxFileName(newProject->GetFilename()).GetPath());
-        if (glob->GetRecursive())
+        if (glob.GetRecursive())
         {
             newWatcher.watcher->AddTree(fname, wxFSW_EVENT_CREATE | wxFSW_EVENT_DELETE | wxFSW_EVENT_RENAME);
         }

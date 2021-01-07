@@ -103,27 +103,24 @@ void ManageGlobsDlg::PopulateList()
 {
     lstGlobsList->DeleteAllItems();
     int i = 0;
-    for (const std::shared_ptr<ProjectGlob>& globObj : m_GlobList)
+    for (const ProjectGlob& globObj : m_GlobList)
     {
-        if (globObj)
-        {
-            lstGlobsList->InsertItem(i, globObj->GetPath());
-            wxString rec = wxString::Format(wxT("%i"), globObj->GetRecursive());
-            lstGlobsList->SetItem(i, 1, rec);
-            lstGlobsList->SetItem(i, 2, globObj->GetWildCard());
-            ++i;
-        }
+        lstGlobsList->InsertItem(i, globObj.GetPath());
+        wxString rec = wxString::Format(wxT("%i"), globObj.GetRecursive());
+        lstGlobsList->SetItem(i, 1, rec);
+        lstGlobsList->SetItem(i, 2, globObj.GetWildCard());
+        ++i;
     }
 }
 
 void ManageGlobsDlg::OnAddClick(wxCommandEvent& event)
 {
-    std::shared_ptr<ProjectGlob> tmpGlob = std::make_shared<ProjectGlob>("", "*.*", false);
+    ProjectGlob tmpGlob = ProjectGlob();
     EditProjectGlobsDlg dlg(tmpGlob, nullptr);
     if (dlg.ShowModal() == wxID_OK)
     {
-        dlg.WriteGlob();
-        if (std::find_if(m_GlobList.begin(), m_GlobList.end(), [&tmpGlob](const std::shared_ptr<ProjectGlob>& a){ return tmpGlob->GetId() == a->GetId(); }) == m_GlobList.end())
+        tmpGlob = dlg.WriteGlob();
+        if (std::find_if(m_GlobList.begin(), m_GlobList.end(), [&tmpGlob](const ProjectGlob& a){ return tmpGlob.GetId() == a.GetId(); }) == m_GlobList.end())
         {
             m_GlobList.push_back(tmpGlob);
             PopulateList();
@@ -137,7 +134,7 @@ void ManageGlobsDlg::OnAddClick(wxCommandEvent& event)
 void ManageGlobsDlg::OnDeleteClick(wxCommandEvent& event)
 {
     int item = -1;
-    std::vector<std::shared_ptr<ProjectGlob>> itemsToDelete;
+    std::vector<ProjectGlob> itemsToDelete;
     for ( ;; )
     {
         item = lstGlobsList->GetNextItem(item,
@@ -148,7 +145,7 @@ void ManageGlobsDlg::OnDeleteClick(wxCommandEvent& event)
         itemsToDelete.push_back(m_GlobList[item]);
     }
 
-    for (auto itr = m_GlobList.begin(); itr != m_GlobList.end(); )
+    for (std::vector<ProjectGlob>::iterator itr = m_GlobList.begin(); itr != m_GlobList.end(); )
     {
         if (std::find(itemsToDelete.begin(),itemsToDelete.end(), *itr ) != itemsToDelete.end())
             itr = m_GlobList.erase(itr);

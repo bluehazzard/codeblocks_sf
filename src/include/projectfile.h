@@ -20,6 +20,7 @@ class cbProject;
 class ProjectGlob;
 class ProjectBuildTarget;
 class pfDetails;
+typedef int64_t GlobId;
 
 WX_DECLARE_HASH_MAP(ProjectBuildTarget*, pfDetails*, wxPointerHash, wxPointerEqual, PFDMap);
 
@@ -191,7 +192,7 @@ class DLLIMPORT ProjectFile
         wxArrayString buildTargets;
 
         /** If this file is part of a project glob, the id for glob will be stored here, -1 otherwise **/
-        int64_t globId;
+        GlobId globId;
 
         /** A string that represents the virtual folder this file will appear in.
           * This is a relative path which doesn't have to exist in the filesystem

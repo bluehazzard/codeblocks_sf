@@ -51,7 +51,7 @@ class ManageGlobsDlg: public wxDialog
 		bool GlobsChanged();
 		void EditSelectedItem();
 
-		std::vector<std::shared_ptr<ProjectGlob>> m_GlobList;
+		std::vector<ProjectGlob> m_GlobList;
 
 		DECLARE_EVENT_TABLE()
 		cbProject* m_Prj;

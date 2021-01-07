@@ -34,7 +34,7 @@ BEGIN_EVENT_TABLE(EditProjectGlobsDlg,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-EditProjectGlobsDlg::EditProjectGlobsDlg(const std::shared_ptr<ProjectGlob> glob, wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size) : m_GlobObj(glob)
+EditProjectGlobsDlg::EditProjectGlobsDlg(const ProjectGlob& glob, wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size) : m_GlobObj(glob)
 {
 	//(*Initialize(EditProjectGlobsDlg)
 	wxBoxSizer* BoxSizer1;
@@ -81,11 +81,11 @@ EditProjectGlobsDlg::EditProjectGlobsDlg(const std::shared_ptr<ProjectGlob> glob
 	SetMaxSize(wxSize(-1, GetMinHeight()));
     Fit();
 
-    if (m_GlobObj)
+    if (m_GlobObj.IsValid())
     {
-        txtPath->SetValue(m_GlobObj->GetPath());
-        txtWildcart->SetValue(m_GlobObj->GetWildCard());
-        chkRecursive->SetValue(m_GlobObj->GetRecursive());
+        txtPath->SetValue(m_GlobObj.GetPath());
+        txtWildcart->SetValue(m_GlobObj.GetWildCard());
+        chkRecursive->SetValue(m_GlobObj.GetRecursive());
     }
 
 }
@@ -143,9 +143,10 @@ void EditProjectGlobsDlg::OnBrowseClick(wxCommandEvent& event)
     txtPath->SetValue(result);
 }
 
-void EditProjectGlobsDlg::WriteGlob()
+ProjectGlob EditProjectGlobsDlg::WriteGlob()
 {
-    m_GlobObj->Set(txtPath->GetValue(), txtWildcart->GetValue(), chkRecursive->GetValue());
+    m_GlobObj.Set(txtPath->GetValue(), txtWildcart->GetValue(), chkRecursive->GetValue());
+    return m_GlobObj;
 }
 
 void EditProjectGlobsDlg::OnOtherClick(wxCommandEvent& event)

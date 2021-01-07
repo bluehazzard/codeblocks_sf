@@ -195,17 +195,18 @@ ProjectFileOptionsDlg::ProjectFileOptionsDlg(wxWindow* parent, ProjectFile* pf) 
     XRCCTRL(*this, "lblGlobId", wxStaticText)->Show(pf->globId != -1);
     wxTextCtrl* txtGlob = XRCCTRL(*this, "txtGlob", wxTextCtrl);
     txtGlob->Show(pf->globId != -1);
-    std::weak_ptr<ProjectGlob> pjGlob = pf->GetParentProject()->SearchGlob(pf->globId);
-    if (!pjGlob.expired())
+    if(pf->globId != -1)
     {
-        std::shared_ptr<ProjectGlob> spPjGlob = pjGlob.lock();
-        txtGlob->SetValue(wxString::Format(_("%s\nrecursive: %s, mask:\"%s\""), spPjGlob->GetPath(), spPjGlob->GetRecursive() ? _("yes") : _("no"), spPjGlob->GetWildCard() ));
+        ProjectGlob pjGlob = pf->GetParentProject()->SearchGlob(pf->globId);
+        if (pjGlob.IsValid())
+        {
+            txtGlob->SetValue(wxString::Format(_("%s\nrecursive: %s, mask:\"%s\""), pjGlob.GetPath(), pjGlob.GetRecursive() ? _("yes") : _("no"), pjGlob.GetWildCard() ));
+        }
+        else
+        {
+            txtGlob->SetValue(_("Could not find glob this file is part of"));
+        }
     }
-    else
-    {
-        txtGlob->SetValue(_("Could not find glob this file is part of"));
-    }
-
 }
 
 ProjectFileOptionsDlg::ProjectFileOptionsDlg(wxWindow* parent, const wxString& fileName) :

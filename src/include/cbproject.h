@@ -89,6 +89,10 @@ enum PCHMode
     pchSourceFile     /// In a file alongside the source header (with .gch appended).
 };
 
+
+
+typedef int64_t GlobId;
+
 /** @brief Represents a project glob.
   *
   * A glob is a combination of path, wildcard and a recursive flag. This describes a
@@ -98,7 +102,6 @@ enum PCHMode
   * the ProjectLoader.
   * @see ProjectManagerUI, ProjectLoader
   */
-
 class ProjectGlob
 {
     public:
@@ -121,7 +124,7 @@ class ProjectGlob
          * \param recursive Search all subfolders of the path
          *
          */
-        ProjectGlob(long id, const wxString& path, const wxString& wildCard, bool recursive) : m_Id(id), m_Path(path), m_WildCard(wildCard), m_Recursive(recursive)
+        ProjectGlob(GlobId id, const wxString& path, const wxString& wildCard, bool recursive) : m_Id(id), m_Path(path), m_WildCard(wildCard), m_Recursive(recursive)
         {
         }
 
@@ -145,7 +148,7 @@ class ProjectGlob
          */
         bool IsValid()           const { return !m_Path.IsEmpty() && m_Id != -1; }
 
-        long GetId()             const { return m_Id; }
+        GlobId GetId()             const { return m_Id; }
         wxString GetIdAsString() const { wxString ret; ret << m_Id; return ret; }
         wxString GetPath()       const { return m_Path; }
         wxString GetWildCard()   const { return m_WildCard; }
@@ -197,6 +200,11 @@ class ProjectGlob
             return (int64_t) ret;  // Make sure we are always positive
         }
 
+        bool operator<(const ProjectGlob& rhs) const
+        {
+            return (int64_t) this->GetId() < (int64_t) rhs.GetId();
+        }
+
     private:
 
         /** \brief Calculate the id from all variables
@@ -204,16 +212,18 @@ class ProjectGlob
          */
         void UpdateId()
         {
-             m_Id = fnv1a( m_Path.ToStdString() + m_WildCard.ToStdString() + (m_Recursive ? "1" : "0"));
+             m_Id = (GlobId) fnv1a( m_Path.ToStdString() + m_WildCard.ToStdString() + (m_Recursive ? "1" : "0"));
         }
 
-        int64_t m_Id;
+        GlobId m_Id;
 
         wxString m_Path;
         wxString m_WildCard;
         bool m_Recursive;
 
 };
+
+
 
 /** @brief Represents a Code::Blocks project.
   *
@@ -566,8 +576,8 @@ class DLLIMPORT cbProject : public CompileTargetBase
         /** Remove a glob from the project
           * @param globs the globs to remove from project.
           */
-        void RemoveGlob(const std::shared_ptr<ProjectGlob>& glob);
-        void RemoveGlobs(const std::vector<std::shared_ptr<ProjectGlob>>& globs);
+        void RemoveGlob(const ProjectGlob& glob);
+        void RemoveGlobs(const std::vector<ProjectGlob>& globs);
 
         /** Set the globs to the project. These are directories that are scanned automatically and
           * the files found are added or removed from the file. The path can be searched
@@ -577,31 +587,31 @@ class DLLIMPORT cbProject : public CompileTargetBase
           * The Project is marked as modified
           * @param globs the globs to set at the project
           */
-        void SetGlobs(std::vector<std::shared_ptr<ProjectGlob>>& globs);
+        void SetGlobs(std::vector<ProjectGlob>& globs);
 
         /** Add a new glob to the project.
           * @param glob the glob to add to the project.
           */
-        void AddGlob(const std::shared_ptr<ProjectGlob> glob);
+        void AddGlob(const ProjectGlob& glob);
 
         /** Retrieve the current globs from the project
           */
-        const std::vector<std::shared_ptr<ProjectGlob>> GetGlobs() const;
+        const std::vector<ProjectGlob> GetGlobs() const;
 
         /** Check if the glob exists and return it
           * @return if found a valid weak pointer, if not found the pointer is invalid
           */
-        std::weak_ptr<ProjectGlob> SearchGlob(wxString path, wxString wildCard, bool recursive) const;
+        ProjectGlob SearchGlob(wxString path, wxString wildCard, bool recursive) const;
 
         /** Check if the glob exists and return it
           * @return if found a valid weak pointer, if not found the pointer is invalid
           */
-        std::weak_ptr<ProjectGlob> SearchGlob(long id) const;
+        ProjectGlob SearchGlob(GlobId id) const;
 
         /** Check if the glob exists and return it
           * @return if found a valid weak pointer, if not found the pointer is invalid
           */
-        std::weak_ptr<ProjectGlob> SearchGlob(wxString id) const;
+        ProjectGlob SearchGlob(wxString id) const;
 
         /** Convenience function for remembering the project's tree state when refreshing it.
           * @return An array of strings containing the tree-path names of expanded nodes.
@@ -890,7 +900,7 @@ class DLLIMPORT cbProject : public CompileTargetBase
         bool                   m_CustomMakefile;
         mutable wxString       m_MakefileExecutionDir;
 
-        std::vector<std::shared_ptr<ProjectGlob>> m_Globs;
+        std::vector<ProjectGlob> m_Globs;
         FilesList         m_Files;
         ProjectFileArray  m_FileArray;
         wxArrayString     m_ExpandedNodes;

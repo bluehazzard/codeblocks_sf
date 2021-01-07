@@ -70,7 +70,7 @@ class DLLIMPORT ProjectLoader : public IBaseLoader
         bool FileModified(){ return m_OpenDirty; }
 
         /** Search for new, or removed files in this glob and update the project accordingly **/
-        bool UpdateGlob(std::shared_ptr<ProjectGlob> glob);
+        bool UpdateGlob(const ProjectGlob& glob);
     protected:
         void DoProjectOptions(TiXmlElement* parentNode);
         void DoCompilerOptions(TiXmlElement* parentNode, ProjectBuildTarget* target = nullptr);

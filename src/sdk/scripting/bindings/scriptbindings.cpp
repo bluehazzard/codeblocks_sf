@@ -200,7 +200,7 @@ namespace ScriptBindings
             const wxString WildCard = (paramCount >= 3 ? *SqPlus::GetInstance<wxString,false>(v, 3) : wxString());
             const bool recursive = (paramCount >= 4 ? sa.GetBool(4) : true);
 
-            std::shared_ptr<ProjectGlob> gl = std::make_shared<ProjectGlob>(path, WildCard, recursive);
+            ProjectGlob gl = ProjectGlob(path, WildCard, recursive);
             prj->AddGlob(gl);
 
             return SQ_OK;
