@@ -1985,7 +1985,7 @@ ProjectGlob cbProject::SearchGlob(GlobId id) const
             return gl;
         }
     }
-    return ProjectGlob();   // Invalid glob
+    return ProjectGlob();   // invalid glob
 }
 
 ProjectGlob cbProject::SearchGlob(wxString id) const
@@ -2002,7 +2002,7 @@ ProjectGlob cbProject::SearchGlob(wxString id) const
         }
     }
 
-    return ProjectGlob();
+    return ProjectGlob();   // invalid glob
 }
 
 wxString cbGetDynamicLinkerPathForTarget(cbProject *project, ProjectBuildTarget* target)

@@ -1466,8 +1466,6 @@ void ProjectManagerUI::OnManageGlobsContext(cb_unused wxCommandEvent& event)
     if (!sel.IsOk())
         return;
 
-    ProjectManager* pm = Manager::Get()->GetProjectManager();
-
     if (FileTreeData* ftd = (FileTreeData*)m_pTree->GetItemData(sel))
     {
         if (cbProject* prj = ftd->GetProject())
