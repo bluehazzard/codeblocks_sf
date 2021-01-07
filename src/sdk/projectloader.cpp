@@ -921,7 +921,7 @@ void ProjectLoader::DoEnvironment(TiXmlElement* parentNode, CompileOptionsBase* 
 
 namespace
 {
-wxString makePathAbsoluteIfNeeded(const wxString& path, const wxString& basePath)
+wxString MakePathAbsoluteIfNeeded(const wxString& path, const wxString& basePath)
 {
     wxString absolute = path;
     wxFileName fname = path;

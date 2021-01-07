@@ -601,17 +601,17 @@ class DLLIMPORT cbProject : public CompileTargetBase
         /** Check if the glob exists and return it
           * @return if found a valid weak pointer, if not found the pointer is invalid
           */
-        ProjectGlob SearchGlob(wxString path, wxString wildCard, bool recursive) const;
+        ProjectGlob SearchGlob(const wxString& path, const wxString& wildCard, bool recursive) const;
 
         /** Check if the glob exists and return it
           * @return if found a valid weak pointer, if not found the pointer is invalid
           */
-        ProjectGlob SearchGlob(GlobId id) const;
+        ProjectGlob SearchGlob(const GlobId& id) const;
 
         /** Check if the glob exists and return it
           * @return if found a valid weak pointer, if not found the pointer is invalid
           */
-        ProjectGlob SearchGlob(wxString id) const;
+        ProjectGlob SearchGlob(const wxString& id) const;
 
         /** Convenience function for remembering the project's tree state when refreshing it.
           * @return An array of strings containing the tree-path names of expanded nodes.

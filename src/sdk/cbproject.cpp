@@ -1970,13 +1970,13 @@ const std::vector<ProjectGlob> cbProject::GetGlobs() const
     return m_Globs;
 }
 
-ProjectGlob cbProject::SearchGlob(wxString path, wxString wildCard, bool recursive) const
+ProjectGlob cbProject::SearchGlob(const wxString& path, const wxString& wildCard, bool recursive) const
 {
     ProjectGlob glob = ProjectGlob(path, wildCard, recursive);
     return SearchGlob(glob.GetId());
 }
 
-ProjectGlob cbProject::SearchGlob(GlobId id) const
+ProjectGlob cbProject::SearchGlob(const GlobId& id) const
 {
     for (const ProjectGlob& gl : m_Globs)
     {
@@ -1988,7 +1988,7 @@ ProjectGlob cbProject::SearchGlob(GlobId id) const
     return ProjectGlob();   // invalid glob
 }
 
-ProjectGlob cbProject::SearchGlob(wxString id) const
+ProjectGlob cbProject::SearchGlob(const wxString& id) const
 {
     long tmp;
     if (id.ToLong(&tmp))
