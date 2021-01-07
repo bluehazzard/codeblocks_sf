@@ -933,7 +933,7 @@ wxString MakePathAbsoluteIfNeeded(const wxString& path, const wxString& basePath
     return absolute;
 }
 
-bool is_relative(wxString path)
+bool IsRelative(wxString path)
 {
     return !(path.GetChar(1) == ':' || path.GetChar(0) == '/');
 }
@@ -949,14 +949,14 @@ void splitPath(wxString path, std::vector<std::string>& out)
     }
 }
 
-wxString makePathRelativeIfNeeded(const wxString& path, const wxString& basePath)
+wxString MakePathRelativeIfNeeded(const wxString& path, const wxString& basePath)
 {
     // This code is inspired heavily from the boost::filesystem::relative function.
     // This code is used instead of the wxWidgets internal function, because it is
     // ~1000 times faster on my machine
     // ! WE DO NOT HANDLE SYMLINKS !
 
-    if (is_relative(path))
+    if (IsRelative(path))
         return path;
 
     std::string pathSeparator;
@@ -1006,20 +1006,20 @@ wxString makePathRelativeIfNeeded(const wxString& path, const wxString& basePath
     return wxString(tmp);
 }
 
-wxArrayString makePathsRelativeIfNeeded(const wxArrayString& paths, const wxString& basePath)
+wxArrayString MakePathsRelativeIfNeeded(const wxArrayString& paths, const wxString& basePath)
 {
     wxStopWatch timer;
     wxArrayString relatives = paths;
     for (std::size_t index = 0U; index < paths.Count(); ++index)
     {
         wxString& path = relatives[index];
-        wxString ret = makePathRelativeIfNeeded(path, basePath);
+        wxString ret = MakePathRelativeIfNeeded(path, basePath);
         path = ret;
     }
     return relatives;
 }
 
-std::vector<wxString> filterOnWildcards(const wxArrayString& files, const wxString& wildCard)
+std::vector<wxString> FilterOnWildcards(const wxArrayString& files, const wxString& wildCard)
 {
     wxString wild = wildCard;
     if (wild.IsEmpty())
@@ -1059,9 +1059,9 @@ void LogTime(const wxString& message, long time)
         Manager::Get()->GetLogManager()->Log(wxString::Format(message, time / 1000.0) );
 }
 
-std::vector<wxString> filesInDir(const wxString& directory, const wxString& wildCard, bool recursive, const wxString& basePath)
+std::vector<wxString> FilesInDir(const wxString& directory, const wxString& wildCard, bool recursive, const wxString& basePath)
 {
-    const wxString directoryPath = makePathAbsoluteIfNeeded(directory, basePath);
+    const wxString directoryPath = MakePathAbsoluteIfNeeded(directory, basePath);
     std::vector<wxString> files;
 
     int flags = wxDIR_FILES;
@@ -1074,10 +1074,10 @@ std::vector<wxString> filesInDir(const wxString& directory, const wxString& wild
     wxDir::GetAllFiles(directoryPath, &filesUnfiltered, wxEmptyString, flags);
     LogTime("wxDir::GetAllFiles %f s", timer.Time());
     timer.Start();
-    filesUnfiltered = makePathsRelativeIfNeeded(filesUnfiltered, basePath);
+    filesUnfiltered = MakePathsRelativeIfNeeded(filesUnfiltered, basePath);
     LogTime("makePathsRelativeIfNeeded %f s", timer.Time());
     timer.Start();
-    std::vector<wxString> ret = filterOnWildcards(filesUnfiltered, wildCard);
+    std::vector<wxString> ret = FilterOnWildcards(filesUnfiltered, wildCard);
     LogTime("filterOnWildcards %f s", timer.Time());
     return ret;
 }
@@ -1091,7 +1091,7 @@ bool ProjectLoader::UpdateGlob(const ProjectGlob& glob)
     const wxString directory = glob.GetPath();
     const wxString wildCard = glob.GetWildCard();
     const bool isRecursive = glob.GetRecursive();
-    std::vector<wxString> globFiles = filesInDir(directory, wildCard, isRecursive, m_pProject->GetBasePath());
+    std::vector<wxString> globFiles = FilesInDir(directory, wildCard, isRecursive, m_pProject->GetBasePath());
     LogTime("Loading directories took %f s", timer.Time());
     timer.Start();
     // Sort the paths so we can use binary_search
