@@ -939,7 +939,7 @@ bool IsRelative(wxString path)
 }
 
 
-void splitPath(wxString path, std::vector<std::string>& out)
+void SplitPath(wxString path, std::vector<std::string>& out)
 {
     path.Replace("\\","/");
     std::stringstream f(path.ToStdString());
@@ -969,8 +969,8 @@ wxString MakePathRelativeIfNeeded(const wxString& path, const wxString& basePath
     std::vector<std::string> vPath;
     std::vector<std::string> vBasePath;
 
-    splitPath(path, vPath);
-    splitPath(basePath, vBasePath);
+    SplitPath(path, vPath);
+    SplitPath(basePath, vBasePath);
 
     std::vector<std::string>::iterator b = vPath.begin(), e = vPath.end(), base_b = vBasePath.begin(), base_e = vBasePath.end();
     std::pair<std::vector<std::string>::iterator, std::vector<std::string>::iterator> mm = std::mismatch(b, e, base_b);
