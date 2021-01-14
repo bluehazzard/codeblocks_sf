@@ -175,7 +175,7 @@ void  ManageGlobsDlg::EditSelectedItem()
     EditProjectGlobsDlg dlg(m_GlobList[item], this);
     if (dlg.ShowModal() == wxID_OK)
     {
-        dlg.WriteGlob();
+        m_GlobList[item] = dlg.WriteGlob();
         m_GlobsChanged = true;
         PopulateList();
     }
