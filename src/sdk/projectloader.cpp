@@ -949,11 +949,13 @@ void SplitPath(wxString path, std::vector<std::string>& out)
     }
 }
 
+
 wxString MakePathRelativeIfNeeded(const wxString& path, const wxString& basePath)
 {
     // This code is inspired heavily from the boost::filesystem::relative function.
     // This code is used instead of the wxWidgets internal function, because it is
     // ~1000 times faster on my machine
+    // using std::string vs wxString makes this function 24x faster
     // ! WE DO NOT HANDLE SYMLINKS !
 
     if (IsRelative(path))
@@ -1782,7 +1784,7 @@ bool ProjectLoader::ExportTargetAsProject(const wxString& filename, const wxStri
 
         if (f->globId != -1)
         {
-            TiXmlElement *el = AddElement(unitnode, "Option", "glob", f->globId);
+            AddElement(unitnode, "Option", "glob", f->globId);
         }
 
         // loop and save custom build commands
